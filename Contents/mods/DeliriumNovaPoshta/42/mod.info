@@ -1,6 +1,6 @@
 name=Delirium Nova Poshta Van
 id=DelNovaPoshta
-description=Adds Nova Poshta delivery vans (vanilla StepVan and Van with a Nova Poshta livery, random body color). Admin-spawned, does not spawn in the world. Build 42.
+description=Nova Poshta delivery vans (vanilla StepVan and Van with a Nova Poshta livery, random body color) and branded cardboard boxes for 5, 10 and 25 kg. Admin-spawned, nothing spawns in the world. Build 42.
 poster=poster.png
 author=noir4
 versionMin=42.13

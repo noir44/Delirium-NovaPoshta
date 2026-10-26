@@ -1,5 +1,5 @@
 version=1
 title=Delirium Nova Poshta Van
-description=Adds Nova Poshta delivery vans: the vanilla StepVan and Van with a Nova Poshta livery on a random body color. Spawned by admins, they do not appear in the world on their own. Build 42.
+description=Nova Poshta delivery vans (the vanilla StepVan and Van with a Nova Poshta livery on a random body color) and branded cardboard boxes for 5, 10 and 25 kg. Spawned by admins, nothing appears in the world on its own. Build 42.
 tags=Build 42;Vehicles
 visibility=public

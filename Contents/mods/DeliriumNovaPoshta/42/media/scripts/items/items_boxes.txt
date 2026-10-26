@@ -1,0 +1,49 @@
+module DelNP
+{
+    imports
+    {
+        Base
+    }
+
+    item Box5
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.5,
+        Icon = DelNP_Box5,
+        Capacity = 5,
+        CloseSound = CloseParcelMedium,
+        OpenSound = OpenParcelMedium,
+        PutInSound = StoreItemParcelMedium,
+        WorldStaticModel = DelNP_Box5,
+        Tags = base:isfirefuel;base:isfiretinder,
+    }
+
+    item Box10
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 0.8,
+        Icon = DelNP_Box10,
+        Capacity = 10,
+        CloseSound = CloseParcelLarge,
+        OpenSound = OpenParcelLarge,
+        PutInSound = StoreItemParcelLarge,
+        WorldStaticModel = DelNP_Box10,
+        Tags = base:isfirefuel;base:isfiretinder,
+    }
+
+    item Box25
+    {
+        DisplayCategory = Container,
+        ItemType = base:container,
+        Weight = 1.2,
+        Icon = DelNP_Box25,
+        Capacity = 25,
+        CloseSound = CloseParcelLarge,
+        OpenSound = OpenParcelLarge,
+        PutInSound = StoreItemParcelLarge,
+        WorldStaticModel = DelNP_Box25,
+        Tags = base:isfirefuel;base:isfiretinder,
+    }
+}
