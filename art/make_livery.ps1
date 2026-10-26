@@ -18,8 +18,9 @@ Add-Type -AssemblyName System.Drawing
 $layouts = @{
     # two sides (top strip mirrored, like vanilla Zippee) + rear doors
     stepvan = @( @(18, 56, 172, $true), @(18, 185, 172, $false), @(412, 211, 76, $false) )
-    # two sides (bottom strip mirrored, like vanilla LectroMax), cargo area
-    van     = @( @(95, 68, 170, $false), @(95, 168, 170, $true) )
+    # two sides (bottom strip mirrored, like vanilla LectroMax): between the
+    # chrome strip (y~38) and the top of the rear wheel arch (y~78 at x~165-215)
+    van     = @( @(85, 59, 125, $false), @(85, 159, 125, $true) )
 }
 $S = 2
 $N = 512 * $S
