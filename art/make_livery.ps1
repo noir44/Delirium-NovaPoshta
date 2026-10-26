@@ -38,5 +38,5 @@ $g.Dispose()
 $tmp = [IO.Path]::GetTempFileName() + '.png'
 $layer.Save($tmp, [Drawing.Imaging.ImageFormat]::Png)
 
-& ffmpeg -v error -y -i $base -i $tmp -filter_complex "[0]scale=iw*${S}:ih*${S}:flags=lanczos,format=rgba[b];[b][1]overlay=format=auto,format=rgba" -frames:v 1 $out
+& ffmpeg -v error -y -i $base -i $tmp -filter_complex "[0]scale=$(512*$S):$(512*$S):flags=lanczos,format=rgba[b];[b][1]overlay=format=auto,format=rgba" -frames:v 1 $out
 Remove-Item $tmp
