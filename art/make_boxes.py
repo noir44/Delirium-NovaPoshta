@@ -2,7 +2,7 @@
 #   blender -b --factory-startup --python make_boxes.py -- <vanilla_fbx_dir> <tex_dir> <out_dir>
 # For each box: import the vanilla FBX, re-UV it to the atlas of
 # make_box_texture.ps1, export <out>/models_X/WorldItems/<name>.fbx,
-# re-import it and check the geometry matches the vanilla mesh, and render
+# re-import it and check the raw vertices match the vanilla mesh, and render
 # the inventory icon <out>/icons/<name>.png (256 px, downscaled later).
 import bpy, sys, os, math
 from mathutils import Vector
@@ -37,8 +37,8 @@ def import_mesh(path):
     bpy.ops.import_scene.fbx(filepath=path)
     return [o for o in bpy.data.objects if o not in before and o.type == 'MESH'][0]
 
-def world_verts(o):
-    return sorted(tuple(round(c, 5) for c in (o.matrix_world @ v.co)) for v in o.data.vertices)
+def local_verts(o):
+    return sorted(tuple(round(c, 4) for c in v.co) for v in o.data.vertices)
 
 def material(name, tex):
     m = bpy.data.materials.new(name)
@@ -56,7 +56,7 @@ os.makedirs(os.path.join(OUT, 'icons'), exist_ok=True)
 for name, (van, texname) in BOXES.items():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     o = import_mesh(os.path.join(VAN, van + '.fbx'))
-    ref = world_verts(o)
+    ref = local_verts(o)
     me = o.data
     lo = Vector([min(v.co[i] for v in me.vertices) for i in range(3)])
     hi = Vector([max(v.co[i] for v in me.vertices) for i in range(3)])
@@ -73,12 +73,16 @@ for name, (van, texname) in BOXES.items():
     bpy.ops.object.select_all(action='DESELECT'); o.select_set(True)
     bpy.context.view_layer.objects.active = o
     bpy.ops.export_scene.fbx(filepath=fbx, use_selection=True, object_types={'MESH'},
-                             path_mode='STRIP', bake_anim=False)
+                             path_mode='STRIP', bake_anim=False,
+                             # PZ ignores the FBX UnitScaleFactor and takes the node scale as is;
+                             # vanilla parcels are in feet (node scale 1/12). Blender writes units 1,
+                             # so shrink by 30.48 to get the vanilla node scale and model-script scales.
+                             global_scale=1 / 30.48)
 
     # round trip: geometry must be the vanilla one
     o2 = import_mesh(fbx)
-    ok = world_verts(o2) == ref
-    print('CHECK', name, 'geometry matches vanilla:', ok, 'dims', tuple(round(d, 4) for d in o2.dimensions))
+    ok = local_verts(o2) == ref and abs(o2.scale[0] * 30.48 - o.scale[0]) < 1e-5
+    print('CHECK', name, 'raw vertices match vanilla, scale x1/30.48:', ok, 'dims', tuple(round(d, 4) for d in o2.dimensions))
     bpy.data.objects.remove(o2)
 
     # icon render: 3/4 view from above, transparent background
