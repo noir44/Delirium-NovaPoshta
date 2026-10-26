@@ -10,16 +10,19 @@ module Base
         specialLootChance = 40,
         carMechanicsOverlay = Base.Van,
         carModelName = Van,
-        forcedColor = -1 -1 0.75,
         model
         {
-            file = Vehicles_Van,
+            file = Vehicles_Van_NoRandom,
             scale = 1.82,
             offset = 0.0 0.3681 0.0,
         }
         skin
         {
-            texture = Vehicles/vehicle_vanshell_novaposhta,
+            texture = Vehicles/vehicle_vanshell_novaposhta_white,
+        }
+        skin
+        {
+            texture = Vehicles/vehicle_vanshell_novaposhta_black,
         }
         textureMask = Vehicles/vehicle_van_mask,
         textureLights = Vehicles/vehicle_van_lights,

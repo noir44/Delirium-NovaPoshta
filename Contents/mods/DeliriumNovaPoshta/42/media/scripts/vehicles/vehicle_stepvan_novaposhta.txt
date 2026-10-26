@@ -3,16 +3,19 @@ module Base
     vehicle StepVan_NovaPoshta
     {
         template! = StepVan,
-        forcedColor = -1 -1 0.75,
         model
         {
-            file = Vehicle_StepVan,
+            file = Vehicle_StepVan_NoRandom,
             scale = 1.82,
             offset = 0.0 0.4725 0.0,
         }
         skin
         {
-            texture = Vehicles/vehicle_stepvanshell_novaposhta,
+            texture = Vehicles/vehicle_stepvanshell_novaposhta_white,
+        }
+        skin
+        {
+            texture = Vehicles/vehicle_stepvanshell_novaposhta_black,
         }
         template = PassengerSeat2,
         template = StepVanCollision,

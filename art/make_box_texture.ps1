@@ -41,9 +41,8 @@ function Face($col, $row, [double]$fw, [double]$fh, $kind) {
     $g.DrawRectangle($pen, [single]($e/2), [single]($e/2), [single]($fw-$e), [single]($fh-$e))
     $tw = [Math]::Min($dx,$dy)*0.18   # tape width
     switch ($kind) {
-        'tapeV' {   # +-X sides: tape runs down the middle, weight label beside it
+        'tapeV' {   # +-X sides: tape only. No text: on some vanilla meshes the two ends share one UV region in the same orientation, so text would read mirrored on one of them
             $g.FillRectangle((New-Object Drawing.SolidBrush $tapeC), [single](($fw-$tw)/2), 0, [single]$tw, [single]($fh*0.45))
-            Label ($fw*0.5) ($fh*0.68) ($fw*0.55) ($fh*0.36)
         }
         'logo' {    # +-Y sides: logo + weight
             $w = $fw*0.78; $h = $w/$aspect

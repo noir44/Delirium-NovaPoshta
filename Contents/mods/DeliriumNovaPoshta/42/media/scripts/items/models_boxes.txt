@@ -1,24 +1,24 @@
 module DelNP
 {
-    /* meshes are the vanilla parcels re-UV'd for our texture (art/make_boxes.py) */
+    /* vanilla parcel meshes with our texture baked onto their UVs (art/make_boxes.py) */
     model DelNP_Box5
     {
-        mesh = WorldItems/DelNP_Box5,
+        mesh = WorldItems/Parcel4_Text,
         texture = WorldItems/DelNP_Box5,
         scale = 0.15,
     }
 
     model DelNP_Box10
     {
-        mesh = WorldItems/DelNP_Box10,
+        mesh = WorldItems/Parcel2_Text,
         texture = WorldItems/DelNP_Box10,
         scale = 0.2,
     }
 
     model DelNP_Box25
     {
-        mesh = WorldItems/DelNP_Box25,
+        mesh = WorldItems/Parcel_Present_1,
         texture = WorldItems/DelNP_Box25,
-        scale = 0.25,
+        scale = 0.3,
     }
 }
