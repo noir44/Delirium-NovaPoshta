@@ -1,27 +1,42 @@
-param($base, $logo, $out)
+# Builds a vehicle shell texture: vanilla shell scaled x2 + logo placements.
+# The vanilla shell's body is alpha 0 (the multiuv shader paints the random
+# color there); the logo is opaque, so it stays as drawn on any body color.
+# GDI+ only draws the logo layer: it drops RGB under alpha 0, so scaling and
+# compositing over the shell is done by ffmpeg, which keeps the channels.
+#
+#   make_livery.ps1 -base vehicle_stepvanshell.png -logo logo.png -out x.png -layout stepvan
+param($base, $logo, $out, $layout)
 Add-Type -AssemblyName System.Drawing
+
+# placements in 512-px shell coordinates: x, center y, width, mirrored
+$layouts = @{
+    # two sides (top strip mirrored, like vanilla Zippee) + rear doors
+    stepvan = @( @(18, 56, 172, $true), @(18, 185, 172, $false), @(412, 211, 76, $false) )
+    # two sides (bottom strip mirrored, like vanilla LectroMax), cargo area
+    van     = @( @(95, 68, 170, $false), @(95, 168, 170, $true) )
+}
+$S = 2
+
 $src = [Drawing.Bitmap]::FromFile($logo)
-# trim transparent padding
 $minX=$src.Width; $minY=$src.Height; $maxX=0; $maxY=0
-for ($y=0; $y -lt $src.Height; $y+=1) { for ($x=0; $x -lt $src.Width; $x+=1) {
-  if ($src.GetPixel($x,$y).A -gt 8) { if($x -lt $minX){$minX=$x}; if($x -gt $maxX){$maxX=$x}; if($y -lt $minY){$minY=$y}; if($y -gt $maxY){$maxY=$y} } } }
+for ($y=0; $y -lt $src.Height; $y++) { for ($x=0; $x -lt $src.Width; $x++) {
+    if ($src.GetPixel($x,$y).A -gt 8) { if($x -lt $minX){$minX=$x}; if($x -gt $maxX){$maxX=$x}; if($y -lt $minY){$minY=$y}; if($y -gt $maxY){$maxY=$y} } } }
 $rect = New-Object Drawing.Rectangle $minX,$minY,($maxX-$minX+1),($maxY-$minY+1)
 $lg = $src.Clone($rect, [Drawing.Imaging.PixelFormat]::Format32bppArgb)
 $lgM = $lg.Clone(); $lgM.RotateFlip([Drawing.RotateFlipType]::RotateNoneFlipX)
 $aspect = $lg.Width / $lg.Height
-"logo bbox $rect aspect $aspect"
 
-$b = [Drawing.Bitmap]::FromFile($base)
-$S = 2
-$dst = New-Object Drawing.Bitmap ($b.Width*$S), ($b.Height*$S), ([Drawing.Imaging.PixelFormat]::Format32bppArgb)
-$g = [Drawing.Graphics]::FromImage($dst)
+$layer = New-Object Drawing.Bitmap (512*$S), (512*$S), ([Drawing.Imaging.PixelFormat]::Format32bppArgb)
+$g = [Drawing.Graphics]::FromImage($layer)
 $g.InterpolationMode = 'HighQualityBicubic'; $g.PixelOffsetMode = 'HighQuality'; $g.SmoothingMode = 'HighQuality'
-$g.DrawImage($b, 0, 0, $dst.Width, $dst.Height)
-
-function Put($img, $x, $y, $w) { $h = $w / $aspect; $g.DrawImage($img, [single]($x*$S), [single]($y*$S), [single]($w*$S), [single]($h*$S)) }
-$w = 172; $h = $w / $aspect
-Put $lg  18 (185 - $h/2) $w        # right side (normal)
-Put $lgM 18 (56  - $h/2) $w        # left side (mirrored strip)
-$rw = 76; Put $lg (450 - $rw/2) (211 - ($rw/$aspect)/2) $rw   # rear doors
+foreach ($p in $layouts[$layout]) {
+    $w = $p[2]; $h = $w / $aspect
+    $img = if ($p[3]) { $lgM } else { $lg }
+    $g.DrawImage($img, [single]($p[0]*$S), [single](($p[1] - $h/2)*$S), [single]($w*$S), [single]($h*$S))
+}
 $g.Dispose()
-$dst.Save($out, [Drawing.Imaging.ImageFormat]::Png)
+$tmp = [IO.Path]::GetTempFileName() + '.png'
+$layer.Save($tmp, [Drawing.Imaging.ImageFormat]::Png)
+
+& ffmpeg -v error -y -i $base -i $tmp -filter_complex "[0]scale=iw*${S}:ih*${S}:flags=lanczos,format=rgba[b];[b][1]overlay=format=auto,format=rgba" -frames:v 1 $out
+Remove-Item $tmp

@@ -5,7 +5,7 @@ module Base
         template! = StepVan,
         model
         {
-            file = Vehicle_StepVan_NoRandom,
+            file = Vehicle_StepVan,
             scale = 1.82,
             offset = 0.0 0.4725 0.0,
         }
