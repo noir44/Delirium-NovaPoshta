@@ -12,3 +12,11 @@ Project Zomboid Build 42 mod: Nova Poshta delivery vans.
 - Items `DelNP.Box5`, `DelNP.Box10`, `DelNP.Box25`: cardboard containers with capacity 5, 10 and 25.
 - Meshes are the vanilla parcels as they are (`Parcel4_Text`, `Parcel2_Text`, `Parcel_Present_1`); our design (`art/make_box_texture.ps1`) is baked onto their UVs by `art/make_boxes.py` (Blender), which also renders the icons.
 - Not in any loot table: spawn them through the admin item list.
+
+## Sealing parcels
+
+- Context menu of a box in your inventory: **Seal parcel...** opens a waybill form. You type the recipient's branch No. (digits) and the recipient's **login**; the number (sequential, `0000001`...), the sender (your login) and the date (game date) are filled in by the server.
+- A sealed box shows its number in its name, cannot be looked into, and nothing can be put in or taken out. **View waybill** shows the filled-in form to anyone.
+- **Open parcel** is offered only to the recipient (login, case-insensitive) and to admins; the box must be in their inventory. After that it is an ordinary box again and can be sealed anew (new number). The waybill keeps a red "Opened: who, date" mark.
+- Register: `Zomboid/Lua/DelNovaPoshta/waybills.txt` on the server, one tab-separated line per seal and per opening; numbers never repeat even if the world rolls back. Server Lua can list it with `DelNP.waybills()`.
+- The lock is client-side (container button hidden, transfers refused), like vanilla's own container checks: a modified client could get round it.

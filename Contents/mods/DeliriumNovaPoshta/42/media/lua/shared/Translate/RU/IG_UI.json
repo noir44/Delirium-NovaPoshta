@@ -1,4 +1,17 @@
 {
     "IGUI_VehicleNameStepVan_NovaPoshta": "Фургон Chevalier «Нова Пошта»",
-    "IGUI_VehicleNameVan_NovaPoshta": "Franklin Valuline «Нова Пошта»"
+    "IGUI_VehicleNameVan_NovaPoshta": "Franklin Valuline «Нова Пошта»",
+    "IGUI_DelNP_SealTitle": "Транспортная накладная",
+    "IGUI_DelNP_Field_no": "Номер:",
+    "IGUI_DelNP_Field_branch": "№ отделения получателя:",
+    "IGUI_DelNP_Field_sender": "Отправитель:",
+    "IGUI_DelNP_Field_recipient": "Получатель (логин):",
+    "IGUI_DelNP_Field_date": "Дата:",
+    "IGUI_DelNP_AutoNumber": "присвоится при запечатывании",
+    "IGUI_DelNP_SealedName": "%1 [№%2]",
+    "IGUI_DelNP_OpenedStamp": "Вскрыто: %1, %2",
+    "IGUI_DelNP_Msg_Opened": "Посылка вскрыта",
+    "IGUI_DelNP_Msg_NotYours": "Вскрыть посылку может только получатель или админ",
+    "IGUI_DelNP_Msg_Invalid": "Накладная заполнена неверно",
+    "IGUI_DelNP_Msg_Failed": "Не удалось зарегистрировать накладную, попробуйте ещё раз"
 }
