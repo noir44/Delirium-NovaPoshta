@@ -3,6 +3,7 @@ module Base
     vehicle StepVan_NovaPoshta
     {
         template! = StepVan,
+        forcedColor = -1 -1 0.75,
         model
         {
             file = Vehicle_StepVan,
