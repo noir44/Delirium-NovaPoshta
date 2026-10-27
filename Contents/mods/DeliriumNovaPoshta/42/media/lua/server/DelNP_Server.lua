@@ -23,6 +23,7 @@ if not isServer() then return end
 
 require "DelNP_Shared"
 
+
 local MODULE = "DelNP"
 local FILE = "DelNovaPoshta/waybills.txt"
 
@@ -38,23 +39,29 @@ local function field(s)
 	return (string.gsub(tostring(s or ""), "[%c]", " "))
 end
 
-local function append(parts)
-	local w = getFileWriter(FILE, true, true)
+---- journals ------------------------------------------------------------------
+-- All of the mod's records (waybills, branches, pickup requests) are
+-- append-only journals in Zomboid/Lua/DelNovaPoshta/, replayed on start.
+
+-- One record = one tab-separated line.
+function DelNP.journalAppend(file, parts)
+	local w = getFileWriter(file, true, true)
 	if not w then
-		print("DelNP: cannot write Zomboid/Lua/" .. FILE)
+		print("DelNP: cannot write Zomboid/Lua/" .. file)
 		return false
 	end
-	for i, p in ipairs(parts) do parts[i] = field(p) end
+	local out = {}
+	for i, p in ipairs(parts) do out[i] = field(p) end
 	-- Leading line break too: a line cut short by a crash would otherwise get
 	-- this record glued to its end and turn into garbage that may still parse.
-	w:write("\r\n" .. table.concat(parts, "\t") .. "\r\n")
+	w:write("\r\n" .. table.concat(out, "\t") .. "\r\n")
 	w:close()
 	return true
 end
 
 -- Tab-separated fields, empty ones kept. string.find only: everything here is
 -- known to work in Kahlua.
-local function split(line)
+function DelNP.split(line)
 	local out = {}
 	local pos = 1
 	while true do
@@ -68,40 +75,76 @@ local function split(line)
 	end
 end
 
+-- Calls onRecord(fields) for every line of a journal; false if there is none.
+function DelNP.journalRead(file, onRecord)
+	local r = getFileReader(file, false)
+	if not r then return false end
+	local line = r:readLine()
+	while line ~= nil do
+		line = string.gsub(line, "\r$", "")
+		if line ~= "" then onRecord(DelNP.split(line)) end
+		line = r:readLine()
+	end
+	r:close()
+	return true
+end
+
+local function append(parts)
+	return DelNP.journalAppend(FILE, parts)
+end
+
+DelNP.STATUSES = { accepted = true, transit = true, arrived = true }
+
+--[[
+waybills.txt records:
+  seal    <no> <branch> <sender> <recipient> <date> <box type> <ms>
+  open    <no> <by> <date> <ms>
+  status  <no> <accepted|transit|arrived> <branch> <by> <date> <ms>   (terminal, staff)
+]]
 local function load()
 	loaded = true
 	DelNP.register = {}
 	DelNP.lastNo = 0
-	local r = getFileReader(FILE, false)
-	if not r then return end
-	local line = r:readLine()
-	while line ~= nil do
-		line = string.gsub(line, "\r$", "")
-		local p = split(line)
+	DelNP.journalRead(FILE, function(p)
 		local no = tonumber(p[2])
 		if p[1] == "seal" and no and #p == 8 and DelNP.BOXES[p[7]] and tonumber(p[8]) then
 			DelNP.register[no] = {
 				no = no, branch = p[3], sender = p[4], recipient = p[5],
-				date = p[6], box = p[7], time = tonumber(p[8]), status = "sealed",
+				date = p[6], box = p[7], time = tonumber(p[8]), status = "sealed", track = {},
 			}
 			if no > DelNP.lastNo then DelNP.lastNo = no end
 		elseif p[1] == "open" and no and #p == 5 and tonumber(p[5]) and DelNP.register[no] then
 			local wb = DelNP.register[no]
 			wb.status = "opened"; wb.openedBy = p[3]; wb.openedDate = p[4]; wb.openedTime = tonumber(p[5])
+		elseif p[1] == "status" and no and #p == 7 and DelNP.STATUSES[p[3]] and tonumber(p[7]) and DelNP.register[no] then
+			table.insert(DelNP.register[no].track, { status = p[3], branch = p[4], by = p[5], date = p[6] })
 		end
-		line = r:readLine()
-	end
-	r:close()
+	end)
 	print("DelNP: register loaded, last waybill " .. DelNP.formatNo(DelNP.lastNo))
+end
+
+function DelNP.ensureLoaded()
+	if not loaded then load() end
 end
 
 -- Every waybill, oldest first: for other mods (a terminal, an admin window).
 function DelNP.waybills()
-	if not loaded then load() end
+	DelNP.ensureLoaded()
 	local list = {}
 	for _, wb in pairs(DelNP.register) do table.insert(list, wb) end
 	table.sort(list, function(a, b) return a.no < b.no end)
 	return list
+end
+
+-- A post-office status set by staff (server/DelNP_Office.lua checks who).
+function DelNP.setStatus(no, status, branch, by)
+	DelNP.ensureLoaded()
+	local wb = DelNP.register[no]
+	if not wb or not DelNP.STATUSES[status] then return false end
+	local date = DelNP.todayText()
+	if not append({ "status", no, status, branch, by, date, getTimestampMs() }) then return false end
+	table.insert(wb.track, { status = status, branch = branch, by = by, date = date })
+	return true
 end
 
 local function tell(player, key)
@@ -139,11 +182,11 @@ local function onSeal(player, args)
 	end
 
 	-- Never number from an unread register.
-	if not loaded then load() end
+	DelNP.ensureLoaded()
 	local no = DelNP.lastNo + 1
 	local wb = {
 		no = no, branch = values.branch, sender = who(player), recipient = values.recipient,
-		date = DelNP.todayText(), box = item:getFullType(), time = getTimestampMs(), status = "sealed",
+		date = DelNP.todayText(), box = item:getFullType(), time = getTimestampMs(), status = "sealed", track = {},
 	}
 	-- The register first: a number written there is spent even if the world
 	-- (and with it this box) rolls back.

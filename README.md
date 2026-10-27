@@ -20,3 +20,7 @@ Project Zomboid Build 42 mod: Nova Poshta delivery vans.
 - **Open parcel** is offered only to the recipient (login, case-insensitive) and to admins; the box must be in their inventory. After that it is an ordinary box again and can be sealed anew (new number). The waybill keeps a red "Opened: who, date" mark.
 - Register: `Zomboid/Lua/DelNovaPoshta/waybills.txt` on the server, one tab-separated line per seal and per opening; numbers never repeat even if the world rolls back. Server Lua can list it with `DelNP.waybills()`.
 - The lock is client-side (container button hidden, transfers refused), like vanilla's own container checks: a modified client could get round it.
+
+## Delirium Terminal app
+
+With the Delirium Terminal mod enabled, computers get a **[8] NOVA POSHTA** menu entry: pickup requests, parcel status by waybill number and "my parcels", branches and staff (admin creates branches and names directors, directors add staff), the staff desk (statuses ACCEPTED / IN TRANSIT / ARRIVED) and the price list (admin edits). Identity is the game login. Data: `Zomboid/Lua/DelNovaPoshta/` (`org.txt`, `requests.txt`, `waybills.txt`, `prices.txt`).
