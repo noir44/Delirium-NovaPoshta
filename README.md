@@ -24,3 +24,7 @@ Project Zomboid Build 42 mod: Nova Poshta delivery vans.
 ## Delirium Terminal app
 
 With the Delirium Terminal mod enabled, computers get a **[8] NOVA POSHTA** menu entry: pickup requests, parcel status by waybill number and "my parcels", branches and staff (admin creates branches and names directors, directors add staff), the staff desk (statuses ACCEPTED / IN TRANSIT / ARRIVED) and the price list (admin edits). Identity is the game login. Data: `Zomboid/Lua/DelNovaPoshta/` (`org.txt`, `requests.txt`, `waybills.txt`, `prices.txt`).
+
+## Payments (with Delirium Shops)
+
+Staff set the delivery price when they mark a parcel ACCEPTED (0 = free); the sender pays it from their Delirium Shops bank account in the terminal. The money goes to the cash desk of the accepting branch; the branch director (or an admin) pays out from it. Until paid, a parcel cannot go IN TRANSIT and cannot be opened by the recipient. Notifications (accepted / to pay / arrived) go to the terminal mail of every terminal account the player registered, and over their head when online.

@@ -296,6 +296,12 @@ local function onOpen(player, args)
 		tell(player, "IGUI_DelNP_Msg_NotYours")
 		return
 	end
+	-- Not before the delivery is paid (server/DelNP_Money.lua); admins may.
+	if DelNP.isPaid and not DelNP.isAdmin(player) and not DelNP.isPaid(noText) then
+		print("DelNP: open refused, [" .. noText .. "] is not paid yet, attempt by " .. who(player))
+		tell(player, "IGUI_DelNP_Msg_NotPaid")
+		return
+	end
 
 	local date = DelNP.todayText()
 	local no = tonumber(noText)

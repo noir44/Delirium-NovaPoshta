@@ -173,6 +173,15 @@ local function waybillText(wb)
 	s = s .. " <RGB:1,1,1> " .. T("Wb_From", U.RichSafe(wb.sender), wb.date or "") .. " <LINE> "
 	s = s .. " <RGB:1,1,1> " .. T("Wb_Route", branchLabel(wb.origin, wb.originName), branchLabel(wb.branch, wb.branchName)) .. " <LINE> "
 	s = s .. " <RGB:1,1,1> " .. T("Wb_To", U.RichSafe(wb.recipient)) .. " <LINE> "
+	if wb.pay then
+		if wb.pay.paid then
+			s = s .. " <RGB:0.6,1,0.6> " .. T("Wb_Paid", wb.pay.priceText, U.RichSafe(wb.pay.paidBy or "?"), wb.pay.paidDate or "") .. " <LINE> "
+		else
+			s = s .. " <RGB:1,0.6,0> " .. T("Wb_ToPay", wb.pay.priceText) .. " <LINE> "
+		end
+	elseif wb.money then
+		s = s .. " <RGB:0.6,0.6,0.6> " .. T("Wb_NoPrice") .. " <LINE> "
+	end
 	if wb.sealed then
 		s = s .. " <RGB:1,1,0> " .. T("Wb_Sealed") .. " <LINE> "
 	else
@@ -197,9 +206,26 @@ function NP.track(win)
 	win.npNo.onCommandEntered = function() NP.find(win) end
 	U.button(win, 180, 30, wF, tFind, function(s) NP.find(s) end)
 	U.button(win, 190 + wF, 30, wM, tMine, function(s) reading(s); send(s, "T_Mine") end)
+	-- Shown for a found parcel the player sent and has not paid for yet.
+	local tPay = T("Btn_Pay")
+	local wP = U.BtnW(tPay, 140)
+	win.npPayBtn = U.button(win, w - 10 - wP, 30, wP, tPay, function(s)
+		if s.npPayNo then send(s, "T_Pay", { no = s.npPayNo }) end
+	end)
+	win.npPayBtn:setVisible(false)
 	win.npText = U.textPanel(win, 10, 62, w - 20, h - 102)
 	reading(win)
 	send(win, "T_Mine")
+end
+
+-- The pay button for the found parcel, if this player owes for it.
+local function updatePay(win, wb)
+	if not win.npPayBtn then return end
+	local me = win.npRoles and win.npRoles.me
+	local owes = wb and wb.pay and not wb.pay.paid and me and string.lower(wb.sender or "") == string.lower(me)
+	win.npPayNo = owes and wb.no or nil
+	if owes then win.npPayBtn:setTitle(T("Btn_PayAmount", wb.pay.priceText)) end
+	win.npPayBtn:setVisible(owes and true or false)
 end
 
 function NP.find(win)
@@ -216,6 +242,7 @@ function NP.renderTrack(win, args)
 	else txt = txt .. " <RGB:1,0,0> " .. T("Track_NotFound", U.RichSafe(args.asked or "")) .. " <LINE> " end
 	win.npText.text = txt; win.npText:paginate()
 	if win.currentPage == "NP_DESK" then NP.fillEdit(win, args.wb) end
+	if win.currentPage == "NP_TRACK" then updatePay(win, args.wb) end
 	doneReading(win)
 end
 
@@ -224,6 +251,12 @@ function NP.renderMine(win, args)
 	local txt = " <FONT:Code> <RGB:0,1,0> " .. T("Track_Mine") .. " <LINE> "
 	if #(args.list or {}) == 0 then txt = txt .. " <RGB:0.6,0.6,0.6> " .. T("Track_MineNone") .. " <LINE> " end
 	for _, wb in ipairs(args.list or {}) do txt = txt .. waybillText(wb) end
+	updatePay(win, nil)
+	if win.npPayBtn then
+		for _, wb in ipairs(args.list or {}) do
+			if wb.pay and not wb.pay.paid and string.lower(wb.sender or "") == string.lower(win.npRoles and win.npRoles.me or "") then txt = txt .. " <RGB:1,0.6,0> " .. T("Track_PayHint") .. " <LINE> "; break end
+		end
+	end
 	win.npText.text = txt; win.npText:paginate()
 	doneReading(win)
 end
@@ -232,12 +265,12 @@ end
 
 function NP.branches(win)
 	local w, h = page(win, "NP_BRANCH", T("Branch_Header"), function(s) NP.home(s) end)
-	win.npText = U.textPanel(win, 10, 30, w - 20, h - 200)
+	win.npText = U.textPanel(win, 10, 30, w - 20, h - 240)
 	local tSave, tDel = T("Btn_Save"), T("Btn_Delete")
 	local wS, wD = U.BtnW(tSave, 100), U.BtnW(tDel, 100)
 
 	-- Admin: create / update / delete a branch.
-	local y = h - 160
+	local y = h - 200
 	win.npBNum = U.entry(win, 10, y, 70, "№", 5)
 	win.npBNum:setOnlyNumbers(true)
 	local free = w - 10 - 80 - 10 - wS - 10 - wD - 10
@@ -275,8 +308,23 @@ function NP.branches(win)
 		send(s, "T_StaffRemove", { num = trim(s.npSNum:getInternalText()), login = s.npSLogin:getInternalText() })
 	end)
 	win.npStaffRow = { win.npSNum, win.npSLogin, bAdd, bRem }
+
+	-- Director or admin: pay out from the branch's cash desk to a bank account.
+	y = y + 40
+	local tPay = T("Btn_Payout")
+	local wPo = U.BtnW(tPay, 120)
+	win.npPNum = U.entry(win, 10, y, 70, "№", 5)
+	win.npPNum:setOnlyNumbers(true)
+	win.npPAmount = U.entry(win, 90, y, 110, T("Branch_Amount"), 12)
+	win.npPAccount = U.entry(win, 210, y, w - 230 - wPo, T("Branch_Account"), 40)
+	local bPay = U.button(win, w - 10 - wPo, y, wPo, tPay, function(s)
+		send(s, "T_Payout", { num = trim(s.npPNum:getInternalText()), amount = s.npPAmount:getInternalText(), account = trim(s.npPAccount:getInternalText()) })
+	end)
+	win.npPayRow = { win.npPNum, win.npPAmount, win.npPAccount, bPay }
+
 	for _, el in ipairs(win.npAdminRow) do el:setVisible(false) end
 	for _, el in ipairs(win.npStaffRow) do el:setVisible(false) end
+	for _, el in ipairs(win.npPayRow) do el:setVisible(false) end
 
 	reading(win)
 	send(win, "T_Branches")
@@ -292,6 +340,7 @@ function NP.renderBranches(win, args)
 		local staff = {}
 		for _, s in ipairs(b.staff or {}) do table.insert(staff, U.RichSafe(s)) end
 		txt = txt .. " <RGB:0.7,0.7,0.7> " .. T("Branch_StaffAre", #staff > 0 and table.concat(staff, ", ") or "-") .. " <LINE> "
+		if b.desk then txt = txt .. " <RGB:1,0.8,0> " .. T("Branch_Desk", b.desk) .. " <LINE> " end
 		txt = txt .. " <RGB:0.3,0.3,0.3> ------------------------------------------------ <LINE> "
 	end
 	win.npText.text = txt; win.npText:paginate()
@@ -299,8 +348,10 @@ function NP.renderBranches(win, args)
 	local canStaff = isAdmin or #(args.directs or {}) > 0
 	for _, el in ipairs(win.npAdminRow or {}) do el:setVisible(isAdmin) end
 	for _, el in ipairs(win.npStaffRow or {}) do el:setVisible(canStaff) end
+	for _, el in ipairs(win.npPayRow or {}) do el:setVisible(canStaff and args.money == true) end
 	if canStaff and not isAdmin and args.directs[1] and trim(win.npSNum:getInternalText()) == "" then
 		win.npSNum:setText(args.directs[1])
+		win.npPNum:setText(args.directs[1])
 	end
 	doneReading(win, canStaff and "" or T("Branch_ReadOnly"))
 end
@@ -347,6 +398,17 @@ function NP.desk(win)
 	end)
 	NP.fillEdit(win, nil)
 
+	-- Delivery price: sent with ACCEPTED; changed before payment by its button.
+	y = h - 108
+	local tPrice = T("Btn_SetPrice")
+	local wPr = U.BtnW(tPrice, 120)
+	win.npPrice, x = labelled(10, y, "Desk_Price", 100, 12)
+	U.button(win, x, y, wPr, tPrice, function(s)
+		local no = trim(s.npNo:getInternalText())
+		if no == "" then return status(s, T("Err_NoNumber"), false) end
+		send(s, "T_SetPrice", { no = no, price = s.npPrice:getInternalText() })
+	end)
+
 	y = h - 70
 	U.label(win, 10, y + 4, T("Desk_Branch"))
 	local lw = getTextManager():MeasureStringX(U.THEME.font, T("Desk_Branch")) + 16
@@ -363,7 +425,7 @@ function NP.desk(win)
 			local branch = trim(s.npDeskBranch:getInternalText())
 			if no == "" then return status(s, T("Err_NoNumber"), false) end
 			if branch == "" then return status(s, T("Err_NoBranchNum"), false) end
-			send(s, "T_Status", { no = no, status = code, branch = branch })
+			send(s, "T_Status", { no = no, status = code, branch = branch, price = s.npPrice:getInternalText() })
 		end)
 		x = x + bw + 10
 	end
@@ -379,6 +441,8 @@ function NP.fillEdit(win, wb)
 		win.npEdit[id]:setEditable(wb ~= nil)
 	end
 	win.npEditSave:setEnable(wb ~= nil)
+	-- Without thousands separators: DelShops.parseAmount reads "," as the decimal point.
+	if win.npPrice then win.npPrice:setText(wb and wb.pay and (string.gsub(wb.pay.priceText, ",", "")) or "") end
 end
 
 ---- prices -------------------------------------------------------------------

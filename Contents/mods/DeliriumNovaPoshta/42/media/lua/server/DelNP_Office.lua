@@ -31,6 +31,7 @@ if not isServer() then return end
 
 require "DelNP_Shared"
 require "DelNP_Server"
+require "DelNP_Money"
 
 local MODULE = "DelNP"
 local ORG = "DelNovaPoshta/org.txt"
@@ -49,6 +50,7 @@ local orgLoaded, reqLoaded = false, false
 
 local function lower(s) return string.lower(tostring(s or "")) end
 local function who(player) return tostring(player:getUsername()) end
+local function trim(s) return (string.match(tostring(s or ""), "^%s*(.-)%s*$")) or "" end
 
 local function clean(text, max, numeric)
 	if type(text) ~= "string" then return nil end
@@ -176,7 +178,12 @@ local function result(player, computerId, ok, msg, arg)
 	reply(player, "T_Result", computerId, { ok = ok, msg = msg, arg = arg })
 end
 
-local function waybillView(wb) return DelNP.waybillView(wb) end
+local function waybillView(wb)
+	local v = DelNP.waybillView(wb)
+	v.pay = DelNP.paymentView(wb.no)
+	v.money = DelNP.moneyEnabled()
+	return v
+end
 
 local function branchList()
 	local list = {}
@@ -301,7 +308,13 @@ end
 
 local function sendBranches(player, cid)
 	local directs = rolesOf(who(player))
-	reply(player, "T_Branches", cid, { list = branchList(), isAdmin = DelNP.isAdmin(player), directs = directs })
+	-- Cash desks: shown to the branch's director and to admins only.
+	local list = branchList()
+	local admin = DelNP.isAdmin(player)
+	for _, b in ipairs(list) do
+		if DelNP.moneyEnabled() and (admin or isDirector(who(player), b.num)) then b.desk = DelNP.fmt(DelNP.deskAmount(b.num)) end
+	end
+	reply(player, "T_Branches", cid, { list = list, isAdmin = admin, directs = directs, money = DelNP.moneyEnabled() })
 end
 
 function handlers.T_Branches(player, args, cid) sendBranches(player, cid) end
@@ -372,10 +385,70 @@ function handlers.T_Status(player, args, cid)
 	if not (DelNP.isAdmin(player) or isStaffOf(who(player), branch)) then
 		return result(player, cid, false, "NotStaffOf", branch)
 	end
+	-- Money: accepting names the price (once, unless it is changed before
+	-- payment); nothing moves on until it is paid.
+	if DelNP.moneyEnabled() then
+		if status == "accepted" and not DelNP.payment(no) then
+			local amount = trim(args.price) ~= "" and DelShops.parseAmount(args.price) or nil
+			if not amount then return result(player, cid, false, "PriceNeeded") end
+			DelNP.setPrice(no, amount, branch, who(player))
+		elseif status ~= "accepted" and not DelNP.isPaid(no) then
+			return result(player, cid, false, DelNP.payment(no) and "NotPaidYet" or "AcceptFirst")
+		end
+	end
 	if not DelNP.setStatus(no, status, branch, who(player)) then return result(player, cid, false, "Failed") end
 	print("DelNP: " .. who(player) .. " set [" .. DelNP.formatNo(no) .. "] " .. status .. " at branch " .. branch)
+	DelNP.notifyStatus(wb, status, branch)
 	result(player, cid, true, "StatusSet", DelNP.formatNo(no))
 	reply(player, "T_Track", cid, { wb = waybillView(wb), asked = DelNP.formatNo(no) })
+end
+
+-- A price changed before payment: staff of the branch that accepted the
+-- parcel, or an admin.
+function handlers.T_SetPrice(player, args, cid)
+	local wb = DelNP.waybill(args.no)
+	if not wb then return result(player, cid, false, "WaybillNotFound", tostring(args.no or "")) end
+	if not DelNP.moneyEnabled() then return result(player, cid, false, "NoMoneyMod") end
+	local p = DelNP.payment(wb.no)
+	if not p then return result(player, cid, false, "AcceptFirst") end
+	if not (DelNP.isAdmin(player) or isStaffOf(who(player), p.branch)) then
+		return result(player, cid, false, "NotStaffOf", p.branch)
+	end
+	local amount = trim(args.price) ~= "" and DelShops.parseAmount(args.price) or nil
+	if not amount then return result(player, cid, false, "PriceNeeded") end
+	local ok, err = DelNP.setPrice(wb.no, amount, p.branch, who(player))
+	if not ok then return result(player, cid, false, err) end
+	print("DelNP: " .. who(player) .. " set the price of [" .. DelNP.formatNo(wb.no) .. "] to " .. DelNP.fmt(amount))
+	DelNP.mailTo(wb.sender, "IGUI_DelNP_Mail_ToPay", { DelNP.formatNo(wb.no), p.branch, DelNP.fmt(amount) })
+	result(player, cid, true, "PriceSet", DelNP.fmt(amount))
+	reply(player, "T_Track", cid, { wb = waybillView(wb), asked = DelNP.formatNo(wb.no) })
+end
+
+-- The sender pays (terminal, "parcel status" page).
+function handlers.T_Pay(player, args, cid)
+	local wb = DelNP.waybill(args.no)
+	if not wb then return result(player, cid, false, "WaybillNotFound", tostring(args.no or "")) end
+	local ok, err, arg = DelNP.pay(player, wb)
+	if not ok then return result(player, cid, false, err, arg) end
+	result(player, cid, true, "Paid", DelNP.formatNo(wb.no))
+	reply(player, "T_Track", cid, { wb = waybillView(wb), asked = DelNP.formatNo(wb.no) })
+end
+
+-- From a branch's cash desk to a bank account: its director or an admin.
+function handlers.T_Payout(player, args, cid)
+	local num = clean(args.num, 5, true)
+	if not num or not org()[num] then return result(player, cid, false, "NoBranch", tostring(args.num or "")) end
+	if not (DelNP.isAdmin(player) or isDirector(who(player), num)) then
+		return result(player, cid, false, "DirectorOnly", num)
+	end
+	if not DelNP.moneyEnabled() then return result(player, cid, false, "NoMoneyMod") end
+	local amount = DelShops.parseAmount(args.amount)
+	local account = clean(args.account, LOGIN_MAX)
+	if not amount or amount <= 0 or not account then return result(player, cid, false, "PayoutFields") end
+	local ok, err, arg = DelNP.payout(num, amount, account, who(player))
+	if not ok then return result(player, cid, false, err, arg) end
+	result(player, cid, true, "PaidOut", DelNP.fmt(amount))
+	sendBranches(player, cid)
 end
 
 --[[

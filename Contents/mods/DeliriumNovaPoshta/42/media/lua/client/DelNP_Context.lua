@@ -196,5 +196,9 @@ Events.OnServerCommand.Add(function(module, command, args)
 		if player then HaloTextHelper.addText(player, getText("IGUI_DelNP_Msg_Opened")) end
 	elseif command == "msg" and player and args and args.key then
 		HaloTextHelper.addText(player, getText(args.key))
+	-- A parcel notification (also sent to the terminal mail): key + arguments.
+	elseif command == "note" and player and args and args.key then
+		local a = args.args or {}
+		HaloTextHelper.addText(player, getText(args.key, a[1] and tostring(a[1]) or "", a[2] and tostring(a[2]) or "", a[3] and tostring(a[3]) or ""))
 	end
 end)
