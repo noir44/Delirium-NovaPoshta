@@ -513,7 +513,14 @@ end)
 local PAGES = { NP_HOME = true, NP_REQ = true, NP_TRACK = true, NP_BRANCH = true, NP_DESK = true, NP_PRICES = true, NP_PRICES_EDIT = true }
 
 Events.OnGameStart.Add(function()
-	if not (DelTerm_RegisterApp and DelTerm_UI) then return end
+	-- Said in console.txt either way: an old Delirium Terminal (before its app
+	-- registry) would otherwise just show no menu entry, with nothing in the log.
+	if not (DelTerm_RegisterApp and DelTerm_UI) then
+		print("DelNP: terminal app NOT registered - Delirium Terminal " ..
+			(DelTerm_Window and "is too old (no DelTerm_RegisterApp)" or "is not loaded"))
+		return
+	end
+	print("DelNP: terminal app registered")
 	U = DelTerm_UI
 	DelTerm_RegisterApp({
 		id = "NovaPoshta",
