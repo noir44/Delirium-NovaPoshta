@@ -103,6 +103,17 @@ local function org()
 	return DelNP.branches
 end
 
+-- For the sealing rules (server/DelNP_Server.lua) and the waybill cards.
+function DelNP.hasBranches()
+	for _ in pairs(org()) do return true end
+	return false
+end
+function DelNP.branchExists(num) return num ~= nil and org()[tostring(num)] ~= nil end
+function DelNP.branchName(num)
+	local b = num and org()[tostring(num)]
+	return b and b.name or nil
+end
+
 local function requests()
 	if not reqLoaded then loadRequests() end
 	return DelNP.requests
@@ -165,17 +176,7 @@ local function result(player, computerId, ok, msg, arg)
 	reply(player, "T_Result", computerId, { ok = ok, msg = msg, arg = arg })
 end
 
-local function waybillView(wb)
-	local track = {}
-	for i, t in ipairs(wb.track or {}) do
-		track[i] = { status = t.status, branch = t.branch, by = t.by, date = t.date }
-	end
-	return {
-		no = DelNP.formatNo(wb.no), branch = wb.branch, sender = wb.sender, recipient = wb.recipient,
-		date = wb.date, box = wb.box, sealed = wb.status == "sealed",
-		openedBy = wb.openedBy, openedDate = wb.openedDate, track = track,
-	}
-end
+local function waybillView(wb) return DelNP.waybillView(wb) end
 
 local function branchList()
 	local list = {}
@@ -375,6 +376,39 @@ function handlers.T_Status(player, args, cid)
 	print("DelNP: " .. who(player) .. " set [" .. DelNP.formatNo(no) .. "] " .. status .. " at branch " .. branch)
 	result(player, cid, true, "StatusSet", DelNP.formatNo(no))
 	reply(player, "T_Track", cid, { wb = waybillView(wb), asked = DelNP.formatNo(no) })
+end
+
+--[[
+Correcting a waybill (a mistyped login, the wrong branch): staff of its
+sending or receiving branch, or an admin. Only fields that really change are
+written, one `edit` record each; branches must exist. The number stays.
+]]
+function handlers.T_Edit(player, args, cid)
+	local wb = DelNP.waybill(args.no)
+	if not wb then return result(player, cid, false, "WaybillNotFound", tostring(args.no or "")) end
+	local me = who(player)
+	if not (DelNP.isAdmin(player) or isStaffOf(me, wb.origin) or isStaffOf(me, wb.branch)) then
+		return result(player, cid, false, "NotStaffOfWaybill")
+	end
+	local sent = type(args.values) == "table" and args.values or {}
+	local changes = {}
+	for _, id in ipairs(DelNP.editOrder) do
+		if sent[id] ~= nil then
+			local v = DelNP.clean(DelNP.editable[id], sent[id])
+			if not v then return result(player, cid, false, "EditInvalid", id) end
+			if (id == "origin" or id == "branch") and not DelNP.branchExists(v) then
+				return result(player, cid, false, "NoBranch", v)
+			end
+			if v ~= (wb[id] or "") then table.insert(changes, { id = id, value = v }) end
+		end
+	end
+	if #changes == 0 then return result(player, cid, true, "EditNothing") end
+	for _, c in ipairs(changes) do
+		if not DelNP.editField(wb.no, c.id, c.value, me) then return result(player, cid, false, "Failed") end
+		print("DelNP: " .. me .. " corrected [" .. DelNP.formatNo(wb.no) .. "] " .. c.id .. " = " .. c.value)
+	end
+	result(player, cid, true, "EditSaved", DelNP.formatNo(wb.no))
+	reply(player, "T_Track", cid, { wb = waybillView(wb), asked = DelNP.formatNo(wb.no) })
 end
 
 function handlers.T_Prices(player, args, cid)

@@ -162,10 +162,17 @@ end
 
 ---- parcel status ------------------------------------------------------------
 
+local function branchLabel(num, name)
+	if not num or num == "" then return "?" end
+	if name and name ~= "" then return num .. " (" .. U.RichSafe(name) .. ")" end
+	return num
+end
+
 local function waybillText(wb)
 	local s = " <RGB:0,1,0> " .. T("Wb_No", wb.no) .. " <LINE> "
 	s = s .. " <RGB:1,1,1> " .. T("Wb_From", U.RichSafe(wb.sender), wb.date or "") .. " <LINE> "
-	s = s .. " <RGB:1,1,1> " .. T("Wb_To", U.RichSafe(wb.recipient), wb.branch or "?") .. " <LINE> "
+	s = s .. " <RGB:1,1,1> " .. T("Wb_Route", branchLabel(wb.origin, wb.originName), branchLabel(wb.branch, wb.branchName)) .. " <LINE> "
+	s = s .. " <RGB:1,1,1> " .. T("Wb_To", U.RichSafe(wb.recipient)) .. " <LINE> "
 	if wb.sealed then
 		s = s .. " <RGB:1,1,0> " .. T("Wb_Sealed") .. " <LINE> "
 	else
@@ -208,7 +215,7 @@ function NP.renderTrack(win, args)
 	if args.wb then txt = txt .. waybillText(args.wb)
 	else txt = txt .. " <RGB:1,0,0> " .. T("Track_NotFound", U.RichSafe(args.asked or "")) .. " <LINE> " end
 	win.npText.text = txt; win.npText:paginate()
-	if win.currentPage == "NP_DESK" then win.npDeskWb = args.wb end
+	if win.currentPage == "NP_DESK" then NP.fillEdit(win, args.wb) end
 	doneReading(win)
 end
 
@@ -308,9 +315,39 @@ function NP.desk(win)
 	win.npNo:setOnlyNumbers(true)
 	win.npNo.onCommandEntered = function() NP.find(win) end
 	U.button(win, 180, 30, wF, tShow, function(s) NP.find(s) end)
-	win.npText = U.textPanel(win, 10, 62, w - 20, h - 140)
+	win.npText = U.textPanel(win, 10, 62, w - 20, h - 250)
 
-	local y = h - 70
+	-- Correcting the found waybill: filled in when it is found (NP.fillEdit).
+	local tm = getTextManager()
+	local function labelled(x, y, key, width, maxLen, numeric)
+		local txt = T(key)
+		U.label(win, x, y + 4, txt)
+		local lw = tm:MeasureStringX(U.THEME.font, txt) + 8
+		local e = U.entry(win, x + lw, y, width, nil, maxLen)
+		if numeric then e:setOnlyNumbers(true) end
+		return e, x + lw + width + 14
+	end
+	local y = h - 180
+	local x
+	win.npEdit = {}
+	win.npEdit.origin, x = labelled(10, y, "Edit_Origin", 60, 5, true)
+	win.npEdit.branch, x = labelled(x, y, "Edit_Branch", 60, 5, true)
+	win.npEdit.date, x = labelled(x, y, "Edit_Date", 110, 10)
+	y = y + 32
+	local tSave = T("Btn_SaveEdit")
+	local wSave = U.BtnW(tSave, 120)
+	local half = math.floor((w - 40 - wSave) / 2)
+	win.npEdit.sender, x = labelled(10, y, "Edit_Sender", half - 110, 40)
+	win.npEdit.recipient, x = labelled(x, y, "Edit_Recipient", half - 110, 40)
+	win.npEditSave = U.button(win, w - 10 - wSave, y, wSave, tSave, function(s)
+		if not s.npDeskWb then return status(s, T("Err_FindFirst"), false) end
+		local values = {}
+		for _, id in ipairs(DelNP.editOrder) do values[id] = s.npEdit[id]:getInternalText() end
+		send(s, "T_Edit", { no = s.npDeskWb.no, values = values })
+	end)
+	NP.fillEdit(win, nil)
+
+	y = h - 70
 	U.label(win, 10, y + 4, T("Desk_Branch"))
 	local lw = getTextManager():MeasureStringX(U.THEME.font, T("Desk_Branch")) + 16
 	win.npDeskBranch = U.entry(win, 10 + lw, y, 70, "№", 5)
@@ -331,6 +368,17 @@ function NP.desk(win)
 		x = x + bw + 10
 	end
 	status(win, T("Desk_Hint"))
+end
+
+-- The found waybill's values into the correction fields (empty when none).
+function NP.fillEdit(win, wb)
+	win.npDeskWb = wb
+	if not win.npEdit then return end
+	for _, id in ipairs(DelNP.editOrder) do
+		win.npEdit[id]:setText(wb and wb[id] or "")
+		win.npEdit[id]:setEditable(wb ~= nil)
+	end
+	win.npEditSave:setEnable(wb ~= nil)
 end
 
 ---- prices -------------------------------------------------------------------

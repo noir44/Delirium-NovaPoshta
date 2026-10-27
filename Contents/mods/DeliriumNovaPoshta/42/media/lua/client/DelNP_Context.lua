@@ -128,6 +128,8 @@ local function onOpen(item, playerNum)
 	sendClientCommand(player, "DelNP", "open", { id = item:getID() })
 end
 
+local lastSync = {}
+
 local function firstBox(items)
 	for _, v in ipairs(items) do
 		local item = v
@@ -149,6 +151,18 @@ local function onFillInventoryObjectContextMenu(playerNum, context, items)
 	-- only place the server looks.
 	local player = getSpecificPlayer(playerNum)
 	if not player or not player:getInventory():containsRecursive(item) then return end
+
+	-- Staff may have corrected the waybill since: ask the server to refresh the
+	-- box's copy (it decides who may open from its register anyway). At most
+	-- every 10 s per box; this menu shows the copy as it is now.
+	if DelNP.hasWaybill(item) then
+		local now = getTimestampMs()
+		lastSync[item:getID()] = lastSync[item:getID()] or 0
+		if now - lastSync[item:getID()] > 10000 then
+			lastSync[item:getID()] = now
+			sendClientCommand(player, "DelNP", "sync", { id = item:getID() })
+		end
+	end
 
 	if DelNP.isSealed(item) then
 		if DelNP.canOpen(player, item) then

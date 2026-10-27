@@ -16,25 +16,54 @@ DelNP.BOXES = {
 	["DelNP.Box25"] = true,
 }
 
--- What the sealer types. The waybill number, the sender (login) and the date
--- are never typed: the server fills them in.
+-- What the sealer types: the sending branch (origin), the receiving branch
+-- (branch) and the recipient's login. The waybill number, the sender (login)
+-- and the date are never typed: the server fills them in.
 DelNP.inputs = {
+	origin    = { max = 5, numeric = true },
 	branch    = { max = 5, numeric = true },
 	recipient = { max = 40 },
 }
-DelNP.inputOrder = { "branch", "recipient" }
+DelNP.inputOrder = { "origin", "branch", "recipient" }
+
+-- What staff and admins may correct afterwards (terminal desk). The number is
+-- the waybill's identity and stays.
+DelNP.editable = {
+	origin    = { max = 5, numeric = true },
+	branch    = { max = 5, numeric = true },
+	sender    = { max = 40 },
+	recipient = { max = 40 },
+	date      = { max = 10 },
+}
+DelNP.editOrder = { "origin", "branch", "sender", "recipient", "date" }
 
 -- The waybill sheet (media/ui/DelNP_Waybill_UA.png, 1:1): the inside of each
 -- frame as fractions of the picture, measured by scanning the artwork for the
--- frames' dark border runs (1254 px original: x 333..1194, date 333..718).
+-- frames' dark border runs (NP2.png, 1254 px: x 395..1195, date 395..739;
+-- y 332/403, 430/514, 543/629, 655/730, 755/837, 861/931).
 DelNP.sheet = "media/ui/DelNP_Waybill_UA.png"
 DelNP.fields = {
-	no        = { x1 = 0.270, x2 = 0.948, y1 = 0.284, y2 = 0.351 },
-	branch    = { x1 = 0.270, x2 = 0.948, y1 = 0.380, y2 = 0.448 },
-	sender    = { x1 = 0.270, x2 = 0.948, y1 = 0.478, y2 = 0.545 },
-	recipient = { x1 = 0.270, x2 = 0.948, y1 = 0.573, y2 = 0.640 },
-	date      = { x1 = 0.270, x2 = 0.569, y1 = 0.669, y2 = 0.728 },
+	no        = { x1 = 0.318, x2 = 0.950, y1 = 0.265, y2 = 0.321 },
+	origin    = { x1 = 0.318, x2 = 0.950, y1 = 0.343, y2 = 0.410 },
+	branch    = { x1 = 0.318, x2 = 0.950, y1 = 0.433, y2 = 0.502 },
+	sender    = { x1 = 0.318, x2 = 0.950, y1 = 0.522, y2 = 0.582 },
+	recipient = { x1 = 0.318, x2 = 0.950, y1 = 0.602, y2 = 0.667 },
+	date      = { x1 = 0.318, x2 = 0.586, y1 = 0.687, y2 = 0.742 },
 }
+-- Free space right of the date frame: the "opened" / status mark.
+DelNP.stampArea = { x1 = 0.610, x2 = 0.950 }
+
+-- One value cleaned for storage: one line, trimmed, capped, digits only where
+-- asked. nil when unusable. Runs on the server for everything a client sends.
+function DelNP.clean(spec, text)
+	if not spec or type(text) ~= "string" then return nil end
+	text = text:gsub("[%c]", " ")
+	text = text:gsub("^%s+", ""):gsub("%s+$", "")
+	if text == "" then return nil end
+	if #text > spec.max then text = text:sub(1, spec.max) end
+	if spec.numeric and not text:match("^%d+$") then return nil end
+	return text
+end
 
 function DelNP.isBox(item)
 	return item ~= nil and DelNP.BOXES[item:getFullType()] == true
@@ -100,14 +129,7 @@ inputs. Runs on the server too - the client may send anything. nil when
 unusable.
 ]]
 function DelNP.sanitiseInput(id, text)
-	local spec = DelNP.inputs[id]
-	if not spec or type(text) ~= "string" then return nil end
-	text = text:gsub("[%c]", " ")
-	text = text:gsub("^%s+", ""):gsub("%s+$", "")
-	if text == "" then return nil end
-	if #text > spec.max then text = text:sub(1, spec.max) end
-	if spec.numeric and not text:match("^%d+$") then return nil end
-	return text
+	return DelNP.clean(DelNP.inputs[id], text)
 end
 
 -- Visible name: the box's own name plus the waybill number while sealed.
