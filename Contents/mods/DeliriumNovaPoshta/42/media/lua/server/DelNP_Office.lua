@@ -158,6 +158,8 @@ end
 local function atTerminal(player, computerId)
 	if not (DelTerm_Data and DelTerm_Data.sessions and computerId) then return false end
 	if not DelTerm_Data.sessions[computerId] then return false end
+	-- The terminal's own rule (computer in reach, or an open charged laptop in hand).
+	if DelTerm_AtTerminal then return DelTerm_AtTerminal(player, computerId, ACCESS_DIST) end
 	local x, y, z = string.match(tostring(computerId), "(-?%d+),(-?%d+),(-?%d+)")
 	if not x then return false end
 	if math.floor(player:getZ()) ~= tonumber(z) then return false end
