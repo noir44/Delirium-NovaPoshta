@@ -166,5 +166,12 @@
     "IGUI_DelNP_Mail_ToPay": "NOVA POSHTA: parcel %1 accepted at branch %2. Delivery %3 - pay in the terminal (Parcel status, find by number).",
     "IGUI_DelNP_Mail_Accepted": "NOVA POSHTA: parcel %1 accepted at branch %2.",
     "IGUI_DelNP_Mail_Arrived": "NOVA POSHTA: parcel %1 has arrived at branch %2. Collect it!",
-    "IGUI_DelNP_T_Wb_BranchNo": "branch %1"
+    "IGUI_DelNP_T_Wb_BranchNo": "branch %1",
+    "IGUI_DelNP_T_Track_ClickHint": "Click a parcel to see it (and pay, if it is due)",
+    "IGUI_DelNP_T_Mine_Paid": "paid",
+    "IGUI_DelNP_T_Mine_ToPay": "to pay %1",
+    "IGUI_DelNP_T_Mine_StSealed": "SEALED",
+    "IGUI_DelNP_T_Mine_StOpened": "OPENED",
+    "IGUI_DelNP_T_Mine_To": "to %1",
+    "IGUI_DelNP_T_Mine_From": "from %1"
 }

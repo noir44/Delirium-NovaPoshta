@@ -11,6 +11,7 @@ player cannot use. Without the terminal mod this file registers nothing.
 if isServer() then return end
 
 require "DelNP_Shared"
+require "ISUI/ISScrollingListBox"
 
 local U -- DelTerm_UI, set at registration
 
@@ -50,6 +51,7 @@ local function doneReading(win, msg)
 end
 
 local NP = {}
+local mineRow -- defined with the parcels list below
 
 ---- home ---------------------------------------------------------------------
 
@@ -216,7 +218,38 @@ function NP.track(win)
 		if s.npPayNo then send(s, "T_Pay", { no = s.npPayNo }) end
 	end)
 	win.npPayBtn:setVisible(false)
-	win.npText = U.textPanel(win, 10, 62, w - 20, h - 102)
+
+	-- My parcels as a list: a click shows the parcel below (and PAY if it is
+	-- unpaid and mine to pay), no number to type.
+	local listH = math.floor((h - 102) * 0.42)
+	local list = ISScrollingListBox:new(10, 62, w - 20, listH)
+	list:initialise(); list:instantiate()
+	list:setFont(U.THEME.font, 3)
+	list.drawBorder = true
+	list.backgroundColor = { r = 0, g = 0, b = 0, a = 1 }
+	list.borderColor = U.THEME.border_dim
+	list.selectionColor = { r = 0, g = 0.5, b = 0, a = 0.5 }
+	list.mouseOverHighlightColor = { r = 0, g = 1, b = 0, a = 0.1 }
+	list:setTextColorRGBA(0, 1, 0, 1)
+	list:setSelectedTextColorRGBA(1, 1, 1, 1)
+	list.doDrawItem = function(lb, y, item, alt)
+		local nextY = ISScrollingListBox.doDrawItem(lb, y, item, alt)
+		local wb = item.item
+		if wb and wb.pay then
+			local pad = (item.height - lb.fontHgt) / 2
+			local txt, r, g, b
+			if wb.pay.paid then txt, r, g, b = T("Mine_Paid"), 0.6, 1, 0.6
+			else txt, r, g, b = T("Mine_ToPay", wb.pay.priceText), 1, 0.6, 0 end
+			lb:drawTextRight(txt, lb:getWidth() - 20, y + pad, r, g, b, 1, lb.font)
+		end
+		return nextY
+	end
+	list:setOnMouseDownFunction(win, function(s, wb) NP.showMine(s, wb) end)
+	win.mainPanel:addChild(list)
+	win.npMineList = list
+	win.npSelNo = nil
+
+	win.npText = U.textPanel(win, 10, 70 + listH, w - 20, h - 110 - listH)
 	reading(win)
 	send(win, "T_Mine")
 end
@@ -245,21 +278,75 @@ function NP.renderTrack(win, args)
 	else txt = txt .. " <RGB:1,0,0> " .. T("Track_NotFound", U.RichSafe(args.asked or "")) .. " <LINE> " end
 	win.npText.text = txt; win.npText:paginate()
 	if win.currentPage == "NP_DESK" then NP.fillEdit(win, args.wb) end
-	if win.currentPage == "NP_TRACK" then updatePay(win, args.wb) end
+	if win.currentPage == "NP_TRACK" then
+		updatePay(win, args.wb)
+		-- Keep the list in step: a payment changes the parcel's row.
+		if args.wb and win.npMineList then
+			win.npSelNo = args.wb.no
+			for i, it in ipairs(win.npMineList.items) do
+				if it.item and it.item.no == args.wb.no then
+					it.item = args.wb
+					it.text = mineRow(win, args.wb)
+					win.npMineList.selected = i
+				end
+			end
+		end
+	end
 	doneReading(win)
+end
+
+-- One row of the list: number, latest state, the other party.
+function mineRow(win, wb)
+	local st
+	if not wb.sealed then st = T("Mine_StOpened")
+	elseif #(wb.track or {}) > 0 then st = statusText(wb.track[#wb.track].status)
+	else st = T("Mine_StSealed") end
+	local me = string.lower(win.npRoles and win.npRoles.me or "")
+	local who
+	if string.lower(wb.sender or "") == me then who = T("Mine_To", wb.recipient or "?")
+	else who = T("Mine_From", wb.sender or "?") end
+	return wb.no .. "  [" .. st .. "]  " .. who
+end
+
+-- The clicked parcel: its card below the list, PAY if it is due.
+function NP.showMine(win, wb)
+	if not wb or not win.npText then return end
+	win.npSelNo = wb.no
+	if win.npNo then win.npNo:setText(wb.no) end
+	win.npText.text = " <FONT:Code> " .. waybillText(wb)
+	win.npText:paginate()
+	updatePay(win, wb)
 end
 
 function NP.renderMine(win, args)
 	if not win.npText then return end
-	local txt = " <FONT:Code> <RGB:0,1,0> " .. T("Track_Mine") .. " <LINE> "
-	if #(args.list or {}) == 0 then txt = txt .. " <RGB:0.6,0.6,0.6> " .. T("Track_MineNone") .. " <LINE> " end
-	for _, wb in ipairs(args.list or {}) do txt = txt .. waybillText(wb) end
+	local list = args.list or {}
 	updatePay(win, nil)
-	if win.npPayBtn then
-		for _, wb in ipairs(args.list or {}) do
-			if wb.pay and not wb.pay.paid and DelNP.isParty(win.npRoles and win.npRoles.me, wb) then txt = txt .. " <RGB:1,0.6,0> " .. T("Track_PayHint") .. " <LINE> "; break end
+	if win.npMineList then
+		win.npMineList:clear()
+		local selected
+		for i, wb in ipairs(list) do
+			win.npMineList:addItem(mineRow(win, wb), wb)
+			if wb.no == win.npSelNo then selected = i end
 		end
+		-- After a payment the list comes again: keep showing the same parcel.
+		if selected then
+			win.npMineList.selected = selected
+			NP.showMine(win, list[selected])
+		else
+			win.npMineList.selected = 0
+			-- A parcel found by number stays on screen; otherwise a hint.
+			if not win.npSelNo then
+				local key = #list == 0 and "Track_MineNone" or "Track_ClickHint"
+				win.npText.text = " <FONT:Code> <RGB:0.6,0.6,0.6> " .. T(key) .. " <LINE> "
+				win.npText:paginate()
+			end
+		end
+		return doneReading(win)
 	end
+	local txt = " <FONT:Code> <RGB:0,1,0> " .. T("Track_Mine") .. " <LINE> "
+	if #list == 0 then txt = txt .. " <RGB:0.6,0.6,0.6> " .. T("Track_MineNone") .. " <LINE> " end
+	for _, wb in ipairs(list) do txt = txt .. waybillText(wb) end
 	win.npText.text = txt; win.npText:paginate()
 	doneReading(win)
 end

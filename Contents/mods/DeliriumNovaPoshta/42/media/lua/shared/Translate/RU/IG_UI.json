@@ -166,5 +166,12 @@
     "IGUI_DelNP_Mail_ToPay": "НОВА ПОШТА: посылка %1 принята в отделении %2. Доставка %3 - оплатите в терминале (Статус посылок, поиск по номеру).",
     "IGUI_DelNP_Mail_Accepted": "НОВА ПОШТА: посылка %1 принята в отделении %2.",
     "IGUI_DelNP_Mail_Arrived": "НОВА ПОШТА: посылка %1 прибыла в отделение %2. Заберите её!",
-    "IGUI_DelNP_T_Wb_BranchNo": "отделение %1"
+    "IGUI_DelNP_T_Wb_BranchNo": "отделение %1",
+    "IGUI_DelNP_T_Track_ClickHint": "Нажмите на посылку, чтобы открыть её (и оплатить, если нужно)",
+    "IGUI_DelNP_T_Mine_Paid": "оплачено",
+    "IGUI_DelNP_T_Mine_ToPay": "к оплате %1",
+    "IGUI_DelNP_T_Mine_StSealed": "ЗАПЕЧАТАНА",
+    "IGUI_DelNP_T_Mine_StOpened": "ВСКРЫТА",
+    "IGUI_DelNP_T_Mine_To": "кому: %1",
+    "IGUI_DelNP_T_Mine_From": "от: %1"
 }

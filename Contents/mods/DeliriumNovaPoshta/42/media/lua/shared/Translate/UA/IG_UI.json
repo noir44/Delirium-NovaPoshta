@@ -166,5 +166,12 @@
     "IGUI_DelNP_Mail_ToPay": "НОВА ПОШТА: посилку %1 прийнято у відділенні %2. Доставка %3 - сплатіть у терміналі (Статус посилок, пошук за номером).",
     "IGUI_DelNP_Mail_Accepted": "НОВА ПОШТА: посилку %1 прийнято у відділенні %2.",
     "IGUI_DelNP_Mail_Arrived": "НОВА ПОШТА: посилка %1 прибула у відділення %2. Заберіть її!",
-    "IGUI_DelNP_T_Wb_BranchNo": "відділення %1"
+    "IGUI_DelNP_T_Wb_BranchNo": "відділення %1",
+    "IGUI_DelNP_T_Track_ClickHint": "Натисніть на посилку, щоб відкрити її (і сплатити, якщо треба)",
+    "IGUI_DelNP_T_Mine_Paid": "сплачено",
+    "IGUI_DelNP_T_Mine_ToPay": "до сплати %1",
+    "IGUI_DelNP_T_Mine_StSealed": "ЗАПЕЧАТАНА",
+    "IGUI_DelNP_T_Mine_StOpened": "ВІДКРИТА",
+    "IGUI_DelNP_T_Mine_To": "кому: %1",
+    "IGUI_DelNP_T_Mine_From": "від: %1"
 }
