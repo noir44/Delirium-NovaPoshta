@@ -1,10 +1,12 @@
 --[[
-Nova Poshta money: delivery price, payment by the sender, branch cash desks;
+Nova Poshta money: delivery price, payment by the sender or the recipient,
+branch cash desks;
 and the notifications to the terminal mail.
 
 Price: set by staff when the parcel is accepted (terminal desk), any amount,
-0 = free; may be changed until paid. The sender pays from their Delirium Shops
-bank account (terminal, by waybill No.); the money goes to the cash desk of
+0 = free; may be changed until paid. The sender or the recipient (whoever
+comes first) pays from their Delirium Shops bank account (terminal, by
+waybill No.); the money goes to the cash desk of
 the branch that accepted the parcel. Until it is paid the parcel cannot go IN
 TRANSIT / ARRIVED and the recipient cannot open it (admins can).
 
@@ -89,14 +91,15 @@ function DelNP.setPrice(no, amount, branch, by)
 	return true
 end
 
--- The sender pays from their bank account. Returns ok, error code, argument.
+-- The sender or the recipient pays from their bank account. Returns ok,
+-- error code, argument.
 function DelNP.pay(player, wb)
 	if not DelNP.moneyEnabled() then return false, "NoMoneyMod" end
 	local p = money().parcels[key(wb.no)]
 	if not p then return false, "NoPrice" end
 	if p.paid then return false, "AlreadyPaid" end
 	local username = player:getUsername()
-	if string.lower(tostring(wb.sender)) ~= string.lower(username) then return false, "NotSender" end
+	if not DelNP.isParty(username, wb) then return false, "NotParty" end
 	if p.price > 0 then
 		local account = accounts()[username]
 		if not account then return false, "NoAccount" end
@@ -170,13 +173,21 @@ local function mailTo(login, keyName, args)
 end
 DelNP.mailTo = mailTo
 
+-- To the sender and the recipient (once when they are the same login).
+function DelNP.mailParties(wb, keyName, args)
+	mailTo(wb.sender, keyName, args)
+	if string.lower(tostring(wb.recipient or "")) ~= string.lower(tostring(wb.sender or "")) then
+		mailTo(wb.recipient, keyName, args)
+	end
+end
+
 -- Called by the terminal desk after a status change.
 function DelNP.notifyStatus(wb, status, branch)
 	local no = DelNP.formatNo(wb.no)
 	if status == "accepted" then
 		local pv = DelNP.paymentView(wb.no)
 		if pv and not pv.paid and pv.price > 0 then
-			mailTo(wb.sender, "IGUI_DelNP_Mail_ToPay", { no, branch, pv.priceText })
+			DelNP.mailParties(wb, "IGUI_DelNP_Mail_ToPay", { no, branch, pv.priceText })
 		else
 			mailTo(wb.sender, "IGUI_DelNP_Mail_Accepted", { no, branch })
 		end

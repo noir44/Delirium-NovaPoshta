@@ -1,6 +1,8 @@
 name=Delirium Nova Poshta Van
 id=DelNovaPoshta
-description=Nova Poshta delivery vans (vanilla StepVan and Van with a Nova Poshta livery, white or black) and branded cardboard boxes for 5, 10 and 25 kg. Admin-spawned, nothing spawns in the world. Build 42.
+description=Nova Poshta delivery vans (vanilla StepVan and Van with a Nova Poshta livery, white or black), branded cardboard boxes for 5, 10 and 25 kg, and wall signs (logo, wordmark, branch number digits). Admin-spawned, nothing spawns in the world. Build 42.
 poster=poster.png
 author=noir4
 versionMin=42.13
+pack=delnovaposhta
+tiledef=delnovaposhta 1515

@@ -16,12 +16,15 @@ DelNP.BOXES = {
 	["DelNP.Box25"] = true,
 }
 
--- What the sealer types: the sending branch (origin), the receiving branch
--- (branch) and the recipient's login. The waybill number, the sender (login)
+-- What the sealer types: where the parcel is sent from (origin), where it
+-- goes (branch) and the recipient's login. Origin and branch are a branch
+-- number or, for a courier pickup or an address delivery, an address in words
+-- (DelNP.isBranchNo tells them apart). The waybill number, the sender (login)
 -- and the date are never typed: the server fills them in.
+DelNP.PLACE_MAX = 60
 DelNP.inputs = {
-	origin    = { max = 5, numeric = true },
-	branch    = { max = 5, numeric = true },
+	origin    = { max = DelNP.PLACE_MAX },
+	branch    = { max = DelNP.PLACE_MAX },
 	recipient = { max = 40 },
 }
 DelNP.inputOrder = { "origin", "branch", "recipient" }
@@ -29,8 +32,8 @@ DelNP.inputOrder = { "origin", "branch", "recipient" }
 -- What staff and admins may correct afterwards (terminal desk). The number is
 -- the waybill's identity and stays.
 DelNP.editable = {
-	origin    = { max = 5, numeric = true },
-	branch    = { max = 5, numeric = true },
+	origin    = { max = DelNP.PLACE_MAX },
+	branch    = { max = DelNP.PLACE_MAX },
 	sender    = { max = 40 },
 	recipient = { max = 40 },
 	date      = { max = 10 },
@@ -63,6 +66,18 @@ function DelNP.clean(spec, text)
 	if #text > spec.max then text = text:sub(1, spec.max) end
 	if spec.numeric and not text:match("^%d+$") then return nil end
 	return text
+end
+
+-- A place written as digits only is a branch number (and must exist when the
+-- server has branches); anything else is an address.
+function DelNP.isBranchNo(text)
+	return type(text) == "string" and #text <= 5 and text:match("^%d+$") ~= nil
+end
+
+-- Who may pay for the delivery: the sender or the recipient.
+function DelNP.isParty(login, wb)
+	login = string.lower(tostring(login or ""))
+	return login ~= "" and (login == string.lower(tostring(wb.sender or "")) or login == string.lower(tostring(wb.recipient or "")))
 end
 
 function DelNP.isBox(item)

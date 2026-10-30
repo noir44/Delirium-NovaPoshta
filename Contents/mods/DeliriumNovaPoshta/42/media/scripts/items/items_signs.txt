@@ -1,0 +1,141 @@
+/*
+Nova Poshta wall signs (art/make_signs.py, tiles delnp_01_*): moveable items
+like vanilla Base.Mov_* - placed on a wall with the vanilla "Place" flow,
+turned with R (each sign has a north-wall and a west-wall sprite, linked by
+GroupName/CustomName). Placed side by side they make one board:
+logo, НОВА + ПОШТА, then the branch number digit by digit.
+*/
+
+module DelNP
+{
+	item Mov_SignLogo
+	{
+		DisplayName = Nova Poshta Sign (logo),
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_0,
+	}
+
+	item Mov_SignWordLeft
+	{
+		DisplayName = Nova Poshta Sign (НОВА, left),
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_2,
+	}
+
+	item Mov_SignWordRight
+	{
+		DisplayName = Nova Poshta Sign (ПОШТА, right),
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_4,
+	}
+
+	item Mov_SignDigit0
+	{
+		DisplayName = Nova Poshta Sign: digit 0,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_6,
+	}
+
+	item Mov_SignDigit1
+	{
+		DisplayName = Nova Poshta Sign: digit 1,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_8,
+	}
+
+	item Mov_SignDigit2
+	{
+		DisplayName = Nova Poshta Sign: digit 2,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_10,
+	}
+
+	item Mov_SignDigit3
+	{
+		DisplayName = Nova Poshta Sign: digit 3,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_12,
+	}
+
+	item Mov_SignDigit4
+	{
+		DisplayName = Nova Poshta Sign: digit 4,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_14,
+	}
+
+	item Mov_SignDigit5
+	{
+		DisplayName = Nova Poshta Sign: digit 5,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_16,
+	}
+
+	item Mov_SignDigit6
+	{
+		DisplayName = Nova Poshta Sign: digit 6,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_18,
+	}
+
+	item Mov_SignDigit7
+	{
+		DisplayName = Nova Poshta Sign: digit 7,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_20,
+	}
+
+	item Mov_SignDigit8
+	{
+		DisplayName = Nova Poshta Sign: digit 8,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_22,
+	}
+
+	item Mov_SignDigit9
+	{
+		DisplayName = Nova Poshta Sign: digit 9,
+		DisplayCategory = Furniture,
+		ItemType = base:moveable,
+		Icon = default,
+		Weight = 0.5,
+		WorldObjectSprite = delnp_01_24,
+	}
+
+}

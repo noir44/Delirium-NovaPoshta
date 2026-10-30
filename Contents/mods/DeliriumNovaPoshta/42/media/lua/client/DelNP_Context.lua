@@ -111,7 +111,7 @@ end
 local function onSeal(item, playerNum)
 	local player = getSpecificPlayer(playerNum)
 	if not player then return end
-	local modal = DelNPSealBox:new(0, 0, 320, 200, getText("IGUI_DelNP_SealTitle"), "",
+	local modal = DelNPSealBox:new(0, 0, 380, 200, getText("IGUI_DelNP_SealTitle"), "",
 		nil, onSealClick, playerNum, player, item)
 	modal:initialise()
 	modal:addToUIManager()

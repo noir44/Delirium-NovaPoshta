@@ -421,12 +421,12 @@ function handlers.T_SetPrice(player, args, cid)
 	local ok, err = DelNP.setPrice(wb.no, amount, p.branch, who(player))
 	if not ok then return result(player, cid, false, err) end
 	print("DelNP: " .. who(player) .. " set the price of [" .. DelNP.formatNo(wb.no) .. "] to " .. DelNP.fmt(amount))
-	DelNP.mailTo(wb.sender, "IGUI_DelNP_Mail_ToPay", { DelNP.formatNo(wb.no), p.branch, DelNP.fmt(amount) })
+	DelNP.mailParties(wb, "IGUI_DelNP_Mail_ToPay", { DelNP.formatNo(wb.no), p.branch, DelNP.fmt(amount) })
 	result(player, cid, true, "PriceSet", DelNP.fmt(amount))
 	reply(player, "T_Track", cid, { wb = waybillView(wb), asked = DelNP.formatNo(wb.no) })
 end
 
--- The sender pays (terminal, "parcel status" page).
+-- The sender or the recipient pays (terminal, "parcel status" page).
 function handlers.T_Pay(player, args, cid)
 	local wb = DelNP.waybill(args.no)
 	if not wb then return result(player, cid, false, "WaybillNotFound", tostring(args.no or "")) end
@@ -471,7 +471,7 @@ function handlers.T_Edit(player, args, cid)
 		if sent[id] ~= nil then
 			local v = DelNP.clean(DelNP.editable[id], sent[id])
 			if not v then return result(player, cid, false, "EditInvalid", id) end
-			if (id == "origin" or id == "branch") and not DelNP.branchExists(v) then
+			if (id == "origin" or id == "branch") and DelNP.isBranchNo(v) and not DelNP.branchExists(v) then
 				return result(player, cid, false, "NoBranch", v)
 			end
 			if v ~= (wb[id] or "") then table.insert(changes, { id = id, value = v }) end

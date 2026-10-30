@@ -193,8 +193,9 @@ function DelNP.waybillView(wb)
 	end
 	local name = DelNP.branchName or function() return nil end
 	return {
-		no = DelNP.formatNo(wb.no), origin = wb.origin, originName = name(wb.origin),
-		branch = wb.branch, branchName = name(wb.branch),
+		no = DelNP.formatNo(wb.no),
+		origin = wb.origin, originName = DelNP.isBranchNo(wb.origin) and name(wb.origin) or nil,
+		branch = wb.branch, branchName = DelNP.isBranchNo(wb.branch) and name(wb.branch) or nil,
 		sender = wb.sender, recipient = wb.recipient, date = wb.date, box = wb.box,
 		sealed = wb.status == "sealed", openedBy = wb.openedBy, openedDate = wb.openedDate, track = track,
 	}
@@ -247,7 +248,7 @@ local function onSeal(player, args)
 		values[id] = v
 	end
 	for _, id in ipairs({ "origin", "branch" }) do
-		if not branchKnown(values[id]) then
+		if DelNP.isBranchNo(values[id]) and not branchKnown(values[id]) then
 			print("DelNP: seal refused, no branch " .. values[id] .. " (" .. id .. ") from " .. who(player))
 			tell(player, "IGUI_DelNP_Msg_NoBranch")
 			return

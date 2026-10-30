@@ -27,6 +27,16 @@ local function fontFor(text, maxWidth)
 	return UIFont.Small
 end
 
+-- Cut to the frame with "..." when even the small font is too wide (an address).
+local function fitText(text, maxWidth)
+	local tm = getTextManager()
+	if tm:MeasureStringX(UIFont.Small, text) <= maxWidth then return text end
+	while #text > 1 and tm:MeasureStringX(UIFont.Small, text .. "...") > maxWidth do
+		text = text:sub(1, #text - 1)
+	end
+	return text .. "..."
+end
+
 -- The box's own copy, in the shape of the server's waybill view.
 local function fromItem(item)
 	local d = {}
@@ -61,6 +71,7 @@ function DelNPWaybillUI:render()
 			text = tostring(text)
 			local pad = 0.012 * self.width
 			local left, right = f.x1 * self.width + pad, f.x2 * self.width - pad
+			text = fitText(text, right - left)
 			local font = fontFor(text, right - left)
 			-- Vertically centred in the frame.
 			local y = ((f.y1 + f.y2) / 2) * self.height - tm:getFontHeight(font) / 2

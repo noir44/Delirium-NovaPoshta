@@ -1,0 +1,424 @@
+{
+  "pack": "delnovaposhta",
+  "tileset": "delnp_01",
+  "columns": 8,
+  "rows": 4,
+  "tiles": [
+    {
+      "index": 0,
+      "png": "delnp_01_0.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Logo",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 1,
+      "png": "delnp_01_1.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Logo",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 2,
+      "png": "delnp_01_2.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "WordLeft",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 3,
+      "png": "delnp_01_3.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "WordLeft",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 4,
+      "png": "delnp_01_4.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "WordRight",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 5,
+      "png": "delnp_01_5.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "WordRight",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 6,
+      "png": "delnp_01_6.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit0",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 7,
+      "png": "delnp_01_7.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit0",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 8,
+      "png": "delnp_01_8.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit1",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 9,
+      "png": "delnp_01_9.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit1",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 10,
+      "png": "delnp_01_10.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit2",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 11,
+      "png": "delnp_01_11.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit2",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 12,
+      "png": "delnp_01_12.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit3",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 13,
+      "png": "delnp_01_13.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit3",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 14,
+      "png": "delnp_01_14.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit4",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 15,
+      "png": "delnp_01_15.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit4",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 16,
+      "png": "delnp_01_16.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit5",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 17,
+      "png": "delnp_01_17.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit5",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 18,
+      "png": "delnp_01_18.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit6",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 19,
+      "png": "delnp_01_19.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit6",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 20,
+      "png": "delnp_01_20.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit7",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 21,
+      "png": "delnp_01_21.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit7",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 22,
+      "png": "delnp_01_22.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit8",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 23,
+      "png": "delnp_01_23.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit8",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    },
+    {
+      "index": 24,
+      "png": "delnp_01_24.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit9",
+        "Facing": "S",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedN": ""
+      }
+    },
+    {
+      "index": 25,
+      "png": "delnp_01_25.png",
+      "props": {
+        "CanScrap": "",
+        "CustomName": "Digit9",
+        "Facing": "E",
+        "GroupName": "NovaPoshta",
+        "IsHigh": "",
+        "IsMoveAble": "",
+        "Material": "SmallMetalPlates",
+        "MoveType": "WallObject",
+        "PickUpWeight": "10",
+        "attachedW": ""
+      }
+    }
+  ]
+}

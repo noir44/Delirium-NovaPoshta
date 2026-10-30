@@ -164,8 +164,11 @@ end
 
 local function branchLabel(num, name)
 	if not num or num == "" then return "?" end
-	if name and name ~= "" then return num .. " (" .. U.RichSafe(name) .. ")" end
-	return num
+	-- A number is a branch; anything else is an address, shown as written.
+	if not DelNP.isBranchNo(num) then return U.RichSafe(num) end
+	local s = T("Wb_BranchNo", num)
+	if name and name ~= "" then s = s .. " (" .. U.RichSafe(name) .. ")" end
+	return s
 end
 
 local function waybillText(wb)
@@ -206,7 +209,7 @@ function NP.track(win)
 	win.npNo.onCommandEntered = function() NP.find(win) end
 	U.button(win, 180, 30, wF, tFind, function(s) NP.find(s) end)
 	U.button(win, 190 + wF, 30, wM, tMine, function(s) reading(s); send(s, "T_Mine") end)
-	-- Shown for a found parcel the player sent and has not paid for yet.
+	-- Shown for an unpaid parcel the player sent or is to receive.
 	local tPay = T("Btn_Pay")
 	local wP = U.BtnW(tPay, 140)
 	win.npPayBtn = U.button(win, w - 10 - wP, 30, wP, tPay, function(s)
@@ -218,11 +221,11 @@ function NP.track(win)
 	send(win, "T_Mine")
 end
 
--- The pay button for the found parcel, if this player owes for it.
+-- The pay button for the found parcel, if this player may pay for it.
 local function updatePay(win, wb)
 	if not win.npPayBtn then return end
 	local me = win.npRoles and win.npRoles.me
-	local owes = wb and wb.pay and not wb.pay.paid and me and string.lower(wb.sender or "") == string.lower(me)
+	local owes = wb and wb.pay and not wb.pay.paid and me and DelNP.isParty(me, wb)
 	win.npPayNo = owes and wb.no or nil
 	if owes then win.npPayBtn:setTitle(T("Btn_PayAmount", wb.pay.priceText)) end
 	win.npPayBtn:setVisible(owes and true or false)
@@ -254,7 +257,7 @@ function NP.renderMine(win, args)
 	updatePay(win, nil)
 	if win.npPayBtn then
 		for _, wb in ipairs(args.list or {}) do
-			if wb.pay and not wb.pay.paid and string.lower(wb.sender or "") == string.lower(win.npRoles and win.npRoles.me or "") then txt = txt .. " <RGB:1,0.6,0> " .. T("Track_PayHint") .. " <LINE> "; break end
+			if wb.pay and not wb.pay.paid and DelNP.isParty(win.npRoles and win.npRoles.me, wb) then txt = txt .. " <RGB:1,0.6,0> " .. T("Track_PayHint") .. " <LINE> "; break end
 		end
 	end
 	win.npText.text = txt; win.npText:paginate()
@@ -381,9 +384,12 @@ function NP.desk(win)
 	local y = h - 180
 	local x
 	win.npEdit = {}
-	win.npEdit.origin, x = labelled(10, y, "Edit_Origin", 60, 5, true)
-	win.npEdit.branch, x = labelled(x, y, "Edit_Branch", 60, 5, true)
-	win.npEdit.date, x = labelled(x, y, "Edit_Date", 110, 10)
+	-- Origin and branch: a branch number or an address, so they get the room.
+	local function labelW(key) return tm:MeasureStringX(U.THEME.font, T(key)) + 8 end
+	local placeW = math.floor((w - 20 - 3 * 14 - 100 - labelW("Edit_Origin") - labelW("Edit_Branch") - labelW("Edit_Date")) / 2)
+	win.npEdit.origin, x = labelled(10, y, "Edit_Origin", placeW, DelNP.PLACE_MAX)
+	win.npEdit.branch, x = labelled(x, y, "Edit_Branch", placeW, DelNP.PLACE_MAX)
+	win.npEdit.date, x = labelled(x, y, "Edit_Date", 100, 10)
 	y = y + 32
 	local tSave = T("Btn_SaveEdit")
 	local wSave = U.BtnW(tSave, 120)
