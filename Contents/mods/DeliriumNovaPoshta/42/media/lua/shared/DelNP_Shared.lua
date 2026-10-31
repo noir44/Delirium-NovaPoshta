@@ -1,5 +1,5 @@
 --[[
-Sealing a Nova Poshta box: shared rules.
+Sealing a Delirium Express box: shared rules.
 
 A sealed box carries a waybill in its modData (DelNP_<field>). While it is
 sealed nobody can look into it or move items in or out; the recipient named on

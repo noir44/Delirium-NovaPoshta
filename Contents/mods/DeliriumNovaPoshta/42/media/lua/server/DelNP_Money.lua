@@ -1,5 +1,5 @@
 --[[
-Nova Poshta money: delivery price, payment by the sender or the recipient,
+Delirium Express money: delivery price, payment by the sender or the recipient,
 branch cash desks;
 and the notifications to the terminal mail.
 
@@ -155,7 +155,7 @@ local function mailTo(login, keyName, args)
 		for name, acc in pairs(DelTerm_Data.accounts) do
 			if acc.owner and string.lower(tostring(acc.owner)) == string.lower(tostring(login)) then
 				DelTerm_Data.email_storage[name] = DelTerm_Data.email_storage[name] or {}
-				table.insert(DelTerm_Data.email_storage[name], { from = "NOVA_POSHTA", date = DelNP.todayText(), text = text, read = false })
+				table.insert(DelTerm_Data.email_storage[name], { from = "DELIRIUM_EXPRESS", date = DelNP.todayText(), text = text, read = false })
 				sent = sent + 1
 			end
 		end

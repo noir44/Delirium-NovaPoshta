@@ -17,10 +17,10 @@ Add-Type -AssemblyName System.Drawing
 # placements in 512-px shell coordinates: x, center y, width, mirrored
 $layouts = @{
     # two sides (top strip mirrored, like vanilla Zippee) + rear doors
-    stepvan = @( @(18, 56, 172, $true), @(18, 185, 172, $false), @(412, 211, 76, $false) )
+    stepvan = @( @(30, 56, 150, $true), @(30, 185, 150, $false), @(418, 211, 64, $false) )
     # two sides (bottom strip mirrored, like vanilla LectroMax): between the
     # chrome strip (y~38) and the top of the rear wheel arch (y~78 at x~165-215)
-    van     = @( @(85, 59, 125, $false), @(85, 159, 125, $true) )
+    van     = @( @(108, 59, 78, $false), @(108, 159, 78, $true) )
 }
 $S = 2
 $N = 512 * $S

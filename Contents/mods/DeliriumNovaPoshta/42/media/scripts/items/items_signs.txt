@@ -1,16 +1,16 @@
 /*
-Nova Poshta wall signs (art/make_signs.py, tiles delnp_01_*): moveable items
+Delirium Express wall signs (art/make_signs.py, tiles delnp_01_*): moveable items
 like vanilla Base.Mov_* - placed on a wall with the vanilla "Place" flow,
 turned with R (each sign has a north-wall and a west-wall sprite, linked by
 GroupName/CustomName). Placed side by side they make one board:
-logo, НОВА + ПОШТА, then the branch number digit by digit.
+box, the logo over two plates, then the branch number digit by digit.
 */
 
 module DelNP
 {
 	item Mov_SignLogo
 	{
-		DisplayName = Nova Poshta Sign (logo),
+		DisplayName = Delirium Express Sign (box),
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -20,7 +20,7 @@ module DelNP
 
 	item Mov_SignWordLeft
 	{
-		DisplayName = Nova Poshta Sign (НОВА, left),
+		DisplayName = Delirium Express Sign (logo, left half),
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -30,7 +30,7 @@ module DelNP
 
 	item Mov_SignWordRight
 	{
-		DisplayName = Nova Poshta Sign (ПОШТА, right),
+		DisplayName = Delirium Express Sign (logo, right half),
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -40,7 +40,7 @@ module DelNP
 
 	item Mov_SignDigit0
 	{
-		DisplayName = Nova Poshta Sign: digit 0,
+		DisplayName = Delirium Express Sign: digit 0,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -50,7 +50,7 @@ module DelNP
 
 	item Mov_SignDigit1
 	{
-		DisplayName = Nova Poshta Sign: digit 1,
+		DisplayName = Delirium Express Sign: digit 1,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -60,7 +60,7 @@ module DelNP
 
 	item Mov_SignDigit2
 	{
-		DisplayName = Nova Poshta Sign: digit 2,
+		DisplayName = Delirium Express Sign: digit 2,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -70,7 +70,7 @@ module DelNP
 
 	item Mov_SignDigit3
 	{
-		DisplayName = Nova Poshta Sign: digit 3,
+		DisplayName = Delirium Express Sign: digit 3,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -80,7 +80,7 @@ module DelNP
 
 	item Mov_SignDigit4
 	{
-		DisplayName = Nova Poshta Sign: digit 4,
+		DisplayName = Delirium Express Sign: digit 4,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -90,7 +90,7 @@ module DelNP
 
 	item Mov_SignDigit5
 	{
-		DisplayName = Nova Poshta Sign: digit 5,
+		DisplayName = Delirium Express Sign: digit 5,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -100,7 +100,7 @@ module DelNP
 
 	item Mov_SignDigit6
 	{
-		DisplayName = Nova Poshta Sign: digit 6,
+		DisplayName = Delirium Express Sign: digit 6,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -110,7 +110,7 @@ module DelNP
 
 	item Mov_SignDigit7
 	{
-		DisplayName = Nova Poshta Sign: digit 7,
+		DisplayName = Delirium Express Sign: digit 7,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -120,7 +120,7 @@ module DelNP
 
 	item Mov_SignDigit8
 	{
-		DisplayName = Nova Poshta Sign: digit 8,
+		DisplayName = Delirium Express Sign: digit 8,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,
@@ -130,7 +130,7 @@ module DelNP
 
 	item Mov_SignDigit9
 	{
-		DisplayName = Nova Poshta Sign: digit 9,
+		DisplayName = Delirium Express Sign: digit 9,
 		DisplayCategory = Furniture,
 		ItemType = base:moveable,
 		Icon = default,

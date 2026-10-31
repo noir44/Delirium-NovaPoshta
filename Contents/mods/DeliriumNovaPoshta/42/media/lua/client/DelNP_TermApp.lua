@@ -1,5 +1,5 @@
 --[[
-Nova Poshta as an app of the Delirium Terminal ([8] on the desktop).
+Delirium Express as an app of the Delirium Terminal ([8] on the desktop).
 
 Pages: NP_HOME (menu), NP_REQ (pickup requests), NP_TRACK (parcel status, my
 parcels), NP_BRANCH (branches and staff), NP_DESK (staff: parcel statuses),

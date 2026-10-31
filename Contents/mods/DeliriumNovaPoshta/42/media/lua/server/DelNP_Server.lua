@@ -1,5 +1,5 @@
 --[[
-Authoritative half of sealing and opening Nova Poshta boxes, and the waybill
+Authoritative half of sealing and opening Delirium Express boxes, and the waybill
 register.
 
 The register is an append-only file, Zomboid/Lua/DelNovaPoshta/waybills.txt,

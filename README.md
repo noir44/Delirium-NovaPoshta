@@ -1,6 +1,8 @@
-# Delirium Nova Poshta Van
+# Delirium Express
 
-Project Zomboid Build 42 mod: Nova Poshta delivery vans.
+Project Zomboid Build 42 mod: Delirium Express, the server's own delivery service (vans, boxes, waybills, wall signs, terminal app). Internal ids (`DelNovaPoshta`, `DelNP`, `*_NovaPoshta`) are left from its first name and stay so that saves and server configs keep working.
+
+Logo: `art/delirium_express_logo.png`; the box mark cut out of it — `art/delirium_express_box.png`.
 
 - Vehicle scripts: `Base.StepVan_NovaPoshta` and `Base.Van_NovaPoshta` — copies of the vanilla `StepVan` and `Van` with their own skin.
 - Textures: `media/textures/Vehicles/vehicle_stepvanshell_novaposhta_{white,black}.png`, `vehicle_vanshell_novaposhta_{white,black}.png` (1024×1024, vanilla UV layout), built by `art/make_livery.ps1`.
@@ -23,7 +25,7 @@ Project Zomboid Build 42 mod: Nova Poshta delivery vans.
 
 ## Delirium Terminal app
 
-With the Delirium Terminal mod enabled, computers get a **[8] NOVA POSHTA** menu entry: pickup requests, parcel status by waybill number and "my parcels", branches and staff (admin creates branches and names directors, directors add staff), the staff desk (statuses ACCEPTED / IN TRANSIT / ARRIVED) and the price list (admin edits). Identity is the game login. Data: `Zomboid/Lua/DelNovaPoshta/` (`org.txt`, `requests.txt`, `waybills.txt`, `prices.txt`).
+With the Delirium Terminal mod enabled, computers get a **[8] DELIRIUM EXPRESS** menu entry: pickup requests, parcel status by waybill number and "my parcels", branches and staff (admin creates branches and names directors, directors add staff), the staff desk (statuses ACCEPTED / IN TRANSIT / ARRIVED) and the price list (admin edits). Identity is the game login. Data: `Zomboid/Lua/DelNovaPoshta/` (`org.txt`, `requests.txt`, `waybills.txt`, `prices.txt`).
 
 ## Payments (with Delirium Shops)
 

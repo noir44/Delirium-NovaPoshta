@@ -1,5 +1,5 @@
 --[[
-Nova Poshta in the Delirium Terminal: the server half.
+Delirium Express in the Delirium Terminal: the server half.
 
 Who you are is your game login (player:getUsername()), the same login the
 waybill names as sender and recipient - not the terminal account you logged

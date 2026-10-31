@@ -1,6 +1,6 @@
 version=1
 id=3827461477
-title=Delirium Nova Poshta Van
-description=Nova Poshta delivery vans (the vanilla StepVan and Van with a Nova Poshta livery, white or black) and branded cardboard boxes for 5, 10 and 25 kg. Spawned by admins, nothing appears in the world on its own. Build 42.
+title=Delirium Express
+description=Delirium Express delivery service: vans (vanilla StepVan and Van in the Delirium Express livery, white or black), branded cardboard boxes for 5, 10 and 25 kg with sealing and waybills, wall signs (logo, branch number digits) and the Delirium Terminal app. Admin-spawned, nothing spawns in the world. Build 42.
 tags=Build 42;Vehicles
 visibility=public

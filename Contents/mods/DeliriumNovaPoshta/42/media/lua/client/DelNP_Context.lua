@@ -1,5 +1,5 @@
 --[[
-Inventory context menu of a Nova Poshta box: seal it (form), look at its
+Inventory context menu of a Delirium Express box: seal it (form), look at its
 waybill, open it (recipient or admin). Presentation only - the server redoes
 every check (server/DelNP_Server.lua).
 ]]
