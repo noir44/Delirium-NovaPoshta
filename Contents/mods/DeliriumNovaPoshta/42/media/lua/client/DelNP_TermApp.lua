@@ -31,6 +31,7 @@ local function statusText(code) return getText("IGUI_DelNP_St_" .. tostring(code
 local function page(win, name, title, back)
 	win:clearScreen()
 	win.currentPage = name
+	win.npList = nil -- the parcels list, on the pages that have one
 	U.remember(win, name)
 	local w, h = win.mainPanel.width, win.mainPanel.height
 	U.label(win, 10, 6, title)
@@ -51,7 +52,8 @@ local function doneReading(win, msg)
 end
 
 local NP = {}
-local mineRow -- defined with the parcels list below
+local mineRow, deskRow -- defined with the parcels lists below
+local DESK_FILTERS = { "all", "active", "mine" }
 
 ---- home ---------------------------------------------------------------------
 
@@ -222,7 +224,16 @@ function NP.track(win)
 	-- My parcels as a list: a click shows the parcel below (and PAY if it is
 	-- unpaid and mine to pay), no number to type.
 	local listH = math.floor((h - 102) * 0.42)
-	local list = ISScrollingListBox:new(10, 62, w - 20, listH)
+	NP.parcelList(win, 10, 62, w - 20, listH, mineRow, NP.showMine)
+	win.npText = U.textPanel(win, 10, 70 + listH, w - 20, h - 110 - listH)
+	reading(win)
+	send(win, "T_Mine")
+end
+
+-- A clickable list of parcels (my parcels, the staff desk): rowFn makes the
+-- text, the payment state is drawn on the right, a click calls onClick(win, wb).
+function NP.parcelList(win, x, y, w, h, rowFn, onClick)
+	local list = ISScrollingListBox:new(x, y, w, h)
 	list:initialise(); list:instantiate()
 	list:setFont(U.THEME.font, 3)
 	list.drawBorder = true
@@ -232,26 +243,51 @@ function NP.track(win)
 	list.mouseOverHighlightColor = { r = 0, g = 1, b = 0, a = 0.1 }
 	list:setTextColorRGBA(0, 1, 0, 1)
 	list:setSelectedTextColorRGBA(1, 1, 1, 1)
-	list.doDrawItem = function(lb, y, item, alt)
-		local nextY = ISScrollingListBox.doDrawItem(lb, y, item, alt)
+	list.doDrawItem = function(lb, iy, item, alt)
+		local nextY = ISScrollingListBox.doDrawItem(lb, iy, item, alt)
 		local wb = item.item
 		if wb and wb.pay then
 			local pad = (item.height - lb.fontHgt) / 2
 			local txt, r, g, b
 			if wb.pay.paid then txt, r, g, b = T("Mine_Paid"), 0.6, 1, 0.6
 			else txt, r, g, b = T("Mine_ToPay", wb.pay.priceText), 1, 0.6, 0 end
-			lb:drawTextRight(txt, lb:getWidth() - 20, y + pad, r, g, b, 1, lb.font)
+			lb:drawTextRight(txt, lb:getWidth() - 20, iy + pad, r, g, b, 1, lb.font)
 		end
 		return nextY
 	end
-	list:setOnMouseDownFunction(win, function(s, wb) NP.showMine(s, wb) end)
+	list:setOnMouseDownFunction(win, onClick)
 	win.mainPanel:addChild(list)
-	win.npMineList = list
+	win.npList = list
+	win.npRowFn = rowFn
 	win.npSelNo = nil
+	return list
+end
 
-	win.npText = U.textPanel(win, 10, 70 + listH, w - 20, h - 110 - listH)
-	reading(win)
-	send(win, "T_Mine")
+-- Fill the list; the parcel shown before (npSelNo) stays selected and shown.
+-- Returns whether it did.
+local function fillParcelList(win, list, onClick)
+	win.npList:clear()
+	local selected
+	for i, wb in ipairs(list) do
+		win.npList:addItem(win.npRowFn(win, wb), wb)
+		if wb.no == win.npSelNo then selected = i end
+	end
+	win.npList.selected = selected or 0
+	if selected then onClick(win, list[selected]) end
+	return selected ~= nil
+end
+
+-- A parcel came back changed (paid, new status, edited): its row too.
+local function updateParcelRow(win, wb)
+	if not (wb and win.npList) then return end
+	win.npSelNo = wb.no
+	for i, it in ipairs(win.npList.items) do
+		if it.item and it.item.no == wb.no then
+			it.item = wb
+			it.text = win.npRowFn(win, wb)
+			win.npList.selected = i
+		end
+	end
 end
 
 -- The pay button for the found parcel, if this player may pay for it.
@@ -278,29 +314,22 @@ function NP.renderTrack(win, args)
 	else txt = txt .. " <RGB:1,0,0> " .. T("Track_NotFound", U.RichSafe(args.asked or "")) .. " <LINE> " end
 	win.npText.text = txt; win.npText:paginate()
 	if win.currentPage == "NP_DESK" then NP.fillEdit(win, args.wb) end
-	if win.currentPage == "NP_TRACK" then
-		updatePay(win, args.wb)
-		-- Keep the list in step: a payment changes the parcel's row.
-		if args.wb and win.npMineList then
-			win.npSelNo = args.wb.no
-			for i, it in ipairs(win.npMineList.items) do
-				if it.item and it.item.no == args.wb.no then
-					it.item = args.wb
-					it.text = mineRow(win, args.wb)
-					win.npMineList.selected = i
-				end
-			end
-		end
-	end
+	if win.currentPage == "NP_TRACK" then updatePay(win, args.wb) end
+	-- Keep the list in step: a payment or a status changes the parcel's row.
+	updateParcelRow(win, args.wb)
 	doneReading(win)
 end
 
 -- One row of the list: number, latest state, the other party.
+-- Opened, else the last post-office status, else just sealed.
+local function parcelState(wb)
+	if not wb.sealed then return T("Mine_StOpened") end
+	if #(wb.track or {}) > 0 then return statusText(wb.track[#wb.track].status) end
+	return T("Mine_StSealed")
+end
+
 function mineRow(win, wb)
-	local st
-	if not wb.sealed then st = T("Mine_StOpened")
-	elseif #(wb.track or {}) > 0 then st = statusText(wb.track[#wb.track].status)
-	else st = T("Mine_StSealed") end
+	local st = parcelState(wb)
 	local me = string.lower(win.npRoles and win.npRoles.me or "")
 	local who
 	if string.lower(wb.sender or "") == me then who = T("Mine_To", wb.recipient or "?")
@@ -322,19 +351,9 @@ function NP.renderMine(win, args)
 	if not win.npText then return end
 	local list = args.list or {}
 	updatePay(win, nil)
-	if win.npMineList then
-		win.npMineList:clear()
-		local selected
-		for i, wb in ipairs(list) do
-			win.npMineList:addItem(mineRow(win, wb), wb)
-			if wb.no == win.npSelNo then selected = i end
-		end
+	if win.npList then
 		-- After a payment the list comes again: keep showing the same parcel.
-		if selected then
-			win.npMineList.selected = selected
-			NP.showMine(win, list[selected])
-		else
-			win.npMineList.selected = 0
+		if not fillParcelList(win, list, NP.showMine) then
 			-- A parcel found by number stays on screen; otherwise a hint.
 			if not win.npSelNo then
 				local key = #list == 0 and "Track_MineNone" or "Track_ClickHint"
@@ -456,7 +475,25 @@ function NP.desk(win)
 	win.npNo:setOnlyNumbers(true)
 	win.npNo.onCommandEntered = function() NP.find(win) end
 	U.button(win, 180, 30, wF, tShow, function(s) NP.find(s) end)
-	win.npText = U.textPanel(win, 10, 62, w - 20, h - 250)
+
+	-- All parcels (or the active ones, or my branches'): a click opens one.
+	win.npDeskFilter = win.npDeskFilter or "all"
+	local tRef = T("Btn_Refresh")
+	local wR = U.BtnW(tRef, 100)
+	local wFl = 0
+	for _, f in ipairs(DESK_FILTERS) do wFl = math.max(wFl, U.BtnW(T("Desk_F_" .. f), 120)) end
+	U.button(win, w - 10 - wR, 30, wR, tRef, function(s) NP.deskList(s) end)
+	win.npFilterBtn = U.button(win, w - 20 - wR - wFl, 30, wFl, T("Desk_F_" .. win.npDeskFilter), function(s)
+		local i = 1
+		for k, f in ipairs(DESK_FILTERS) do if f == s.npDeskFilter then i = k end end
+		s.npDeskFilter = DESK_FILTERS[i % #DESK_FILTERS + 1]
+		s.npFilterBtn:setTitle(T("Desk_F_" .. s.npDeskFilter))
+		NP.deskList(s)
+	end)
+	local area = h - 250
+	local listH = math.floor(area * 0.5)
+	NP.parcelList(win, 10, 62, w - 20, listH, deskRow, NP.showDesk)
+	win.npText = U.textPanel(win, 10, 70 + listH, w - 20, area - listH - 8)
 
 	-- Correcting the found waybill: filled in when it is found (NP.fillEdit).
 	local tm = getTextManager()
@@ -522,7 +559,44 @@ function NP.desk(win)
 		end)
 		x = x + bw + 10
 	end
-	status(win, T("Desk_Hint"))
+	NP.deskList(win)
+end
+
+function NP.deskList(win)
+	reading(win)
+	send(win, "T_DeskList", { filter = win.npDeskFilter })
+end
+
+-- Desk row: number, state, route, sender -> recipient. Addresses are cut.
+local function short(s, n)
+	s = tostring(s or "?")
+	if #s > n then return string.sub(s, 1, n - 3) .. "..." end
+	return s
+end
+
+function deskRow(win, wb)
+	return wb.no .. "  [" .. parcelState(wb) .. "]  " .. short(wb.origin, 16) .. " -> " .. short(wb.branch, 16) ..
+		"  " .. short(wb.sender, 14) .. " -> " .. short(wb.recipient, 14)
+end
+
+-- The clicked parcel: card, correction fields and price, number for the buttons.
+function NP.showDesk(win, wb)
+	if not wb or not win.npText then return end
+	win.npSelNo = wb.no
+	if win.npNo then win.npNo:setText(wb.no) end
+	win.npText.text = " <FONT:Code> " .. waybillText(wb)
+	win.npText:paginate()
+	NP.fillEdit(win, wb)
+end
+
+function NP.renderDeskList(win, args)
+	if not win.npList then return end
+	local list = args.list or {}
+	if not fillParcelList(win, list, NP.showDesk) and not win.npDeskWb then
+		win.npText.text = " <FONT:Code> <RGB:0.6,0.6,0.6> " .. T(#list == 0 and "Desk_None" or "Desk_ClickHint") .. " <LINE> "
+		win.npText:paginate()
+	end
+	doneReading(win, T("Desk_Count", #list, args.total or #list))
 end
 
 -- The found waybill's values into the correction fields (empty when none).
@@ -596,6 +670,7 @@ Events.OnServerCommand.Add(function(module, command, args)
 	elseif command == "T_Requests" and p == "NP_REQ" then NP.renderRequests(win, args)
 	elseif command == "T_Track" and (p == "NP_TRACK" or p == "NP_DESK") then NP.renderTrack(win, args)
 	elseif command == "T_Mine" and p == "NP_TRACK" then NP.renderMine(win, args)
+	elseif command == "T_DeskList" and p == "NP_DESK" then NP.renderDeskList(win, args)
 	elseif command == "T_Branches" and p == "NP_BRANCH" then NP.renderBranches(win, args)
 	elseif command == "T_Prices" then NP.renderPrices(win, args)
 	end

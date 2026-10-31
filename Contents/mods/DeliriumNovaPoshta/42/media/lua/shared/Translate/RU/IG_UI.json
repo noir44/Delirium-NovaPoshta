@@ -80,7 +80,7 @@
     "IGUI_DelNP_T_Branch_StaffAre": "Сотрудники: %1",
     "IGUI_DelNP_T_Branch_ConfirmDelete": "Удалить отделение %1 вместе с сотрудниками? Нажмите ещё раз.",
     "IGUI_DelNP_T_Branch_ReadOnly": "Менять могут только админ и директора",
-    "IGUI_DelNP_T_Desk_Header": "Найдите посылку и смените статус",
+    "IGUI_DelNP_T_Desk_Header": "Посылки: выберите и смените статус",
     "IGUI_DelNP_T_Desk_Branch": "В отделении:",
     "IGUI_DelNP_T_Desk_Hint": "Найдите накладную. ПРИНЯТА - с ценой; поля можно исправить",
     "IGUI_DelNP_T_Prices_Header": "Тарифы на доставку",
@@ -173,5 +173,13 @@
     "IGUI_DelNP_T_Mine_StSealed": "ЗАПЕЧАТАНА",
     "IGUI_DelNP_T_Mine_StOpened": "ВСКРЫТА",
     "IGUI_DelNP_T_Mine_To": "кому: %1",
-    "IGUI_DelNP_T_Mine_From": "от: %1"
+    "IGUI_DelNP_T_Mine_From": "от: %1",
+    "IGUI_DelNP_T_Btn_Refresh": "ОБНОВИТЬ",
+    "IGUI_DelNP_T_Desk_F_all": "ВСЕ",
+    "IGUI_DelNP_T_Desk_F_active": "В РАБОТЕ",
+    "IGUI_DelNP_T_Desk_F_mine": "МОИ ОТДЕЛЕНИЯ",
+    "IGUI_DelNP_T_Desk_None": "Посылок нет",
+    "IGUI_DelNP_T_Desk_ClickHint": "Нажмите на посылку, чтобы открыть её: статус, цена, исправления",
+    "IGUI_DelNP_T_Desk_Count": "Показано %1 из %2",
+    "IGUI_DelNP_TMsg_StaffOnly": "Только для сотрудников почты и админа"
 }

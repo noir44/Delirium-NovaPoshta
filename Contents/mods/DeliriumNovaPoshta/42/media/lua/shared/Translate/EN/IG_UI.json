@@ -80,7 +80,7 @@
     "IGUI_DelNP_T_Branch_StaffAre": "Staff: %1",
     "IGUI_DelNP_T_Branch_ConfirmDelete": "Delete branch %1 with its staff? Press again.",
     "IGUI_DelNP_T_Branch_ReadOnly": "Only admins and directors can change this",
-    "IGUI_DelNP_T_Desk_Header": "Find a parcel and set its status",
+    "IGUI_DelNP_T_Desk_Header": "Parcels: pick one and change its status",
     "IGUI_DelNP_T_Desk_Branch": "At branch:",
     "IGUI_DelNP_T_Desk_Hint": "Find a waybill. ACCEPTED needs the price; fields can be fixed",
     "IGUI_DelNP_T_Prices_Header": "Delivery prices",
@@ -173,5 +173,13 @@
     "IGUI_DelNP_T_Mine_StSealed": "SEALED",
     "IGUI_DelNP_T_Mine_StOpened": "OPENED",
     "IGUI_DelNP_T_Mine_To": "to %1",
-    "IGUI_DelNP_T_Mine_From": "from %1"
+    "IGUI_DelNP_T_Mine_From": "from %1",
+    "IGUI_DelNP_T_Btn_Refresh": "REFRESH",
+    "IGUI_DelNP_T_Desk_F_all": "ALL",
+    "IGUI_DelNP_T_Desk_F_active": "IN WORK",
+    "IGUI_DelNP_T_Desk_F_mine": "MY BRANCHES",
+    "IGUI_DelNP_T_Desk_None": "No parcels",
+    "IGUI_DelNP_T_Desk_ClickHint": "Click a parcel to open it: status, price, corrections",
+    "IGUI_DelNP_T_Desk_Count": "Shown %1 of %2",
+    "IGUI_DelNP_TMsg_StaffOnly": "Post office staff and admins only"
 }

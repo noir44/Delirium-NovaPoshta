@@ -249,6 +249,31 @@ function handlers.T_Mine(player, args, cid)
 	reply(player, "T_Mine", cid, { list = list })
 end
 
+-- Staff desk: every parcel, newest first. Filter "active" = still sealed,
+-- "mine" = sent from or to a branch where this login works.
+local DESK_LIST_MAX = 100
+
+function handlers.T_DeskList(player, args, cid)
+	if not isAnyStaff(player) then return result(player, cid, false, "StaffOnly") end
+	local filter = args.filter
+	local _, works = rolesOf(who(player))
+	local mine = {}
+	for _, num in ipairs(works) do mine[num] = true end
+	local list, total = {}, 0
+	local all = DelNP.waybills()
+	for i = #all, 1, -1 do
+		local wb = all[i]
+		local take = true
+		if filter == "active" then take = wb.status == "sealed"
+		elseif filter == "mine" then take = mine[wb.origin] == true or mine[wb.branch] == true end
+		if take then
+			total = total + 1
+			if #list < DESK_LIST_MAX then table.insert(list, waybillView(wb)) end
+		end
+	end
+	reply(player, "T_DeskList", cid, { list = list, total = total, filter = filter })
+end
+
 local function sendRequests(player, cid)
 	local me = lower(who(player))
 	local staff = isAnyStaff(player)

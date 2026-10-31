@@ -25,7 +25,7 @@ Logo: `art/delirium_express_logo.png`; the box mark cut out of it — `art/delir
 
 ## Delirium Terminal app
 
-With the Delirium Terminal mod enabled, computers get a **[8] DELIRIUM EXPRESS** menu entry: pickup requests, parcel status by waybill number and "my parcels", branches and staff (admin creates branches and names directors, directors add staff), the staff desk (statuses ACCEPTED / IN TRANSIT / ARRIVED) and the price list (admin edits). Identity is the game login. Data: `Zomboid/Lua/DelNovaPoshta/` (`org.txt`, `requests.txt`, `waybills.txt`, `prices.txt`).
+With the Delirium Terminal mod enabled, computers get a **[8] DELIRIUM EXPRESS** menu entry: pickup requests, parcel status by waybill number and "my parcels", branches and staff (admin creates branches and names directors, directors add staff), the staff desk (list of all parcels with filters all / in work / my branches, statuses ACCEPTED / IN TRANSIT / ARRIVED) and the price list (admin edits). Identity is the game login. Data: `Zomboid/Lua/DelNovaPoshta/` (`org.txt`, `requests.txt`, `waybills.txt`, `prices.txt`).
 
 ## Payments (with Delirium Shops)
 

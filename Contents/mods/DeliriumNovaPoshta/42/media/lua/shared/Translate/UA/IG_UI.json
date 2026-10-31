@@ -80,7 +80,7 @@
     "IGUI_DelNP_T_Branch_StaffAre": "Співробітники: %1",
     "IGUI_DelNP_T_Branch_ConfirmDelete": "Видалити відділення %1 разом зі співробітниками? Натисніть ще раз.",
     "IGUI_DelNP_T_Branch_ReadOnly": "Змінювати можуть лише адмін і директори",
-    "IGUI_DelNP_T_Desk_Header": "Знайдіть посилку та змініть статус",
+    "IGUI_DelNP_T_Desk_Header": "Посилки: оберіть і змініть статус",
     "IGUI_DelNP_T_Desk_Branch": "У відділенні:",
     "IGUI_DelNP_T_Desk_Hint": "Знайдіть накладну. ПРИЙНЯТА - з ціною; поля можна виправити",
     "IGUI_DelNP_T_Prices_Header": "Тарифи на доставку",
@@ -173,5 +173,13 @@
     "IGUI_DelNP_T_Mine_StSealed": "ЗАПЕЧАТАНА",
     "IGUI_DelNP_T_Mine_StOpened": "ВІДКРИТА",
     "IGUI_DelNP_T_Mine_To": "кому: %1",
-    "IGUI_DelNP_T_Mine_From": "від: %1"
+    "IGUI_DelNP_T_Mine_From": "від: %1",
+    "IGUI_DelNP_T_Btn_Refresh": "ОНОВИТИ",
+    "IGUI_DelNP_T_Desk_F_all": "УСІ",
+    "IGUI_DelNP_T_Desk_F_active": "В РОБОТІ",
+    "IGUI_DelNP_T_Desk_F_mine": "МОЇ ВІДДІЛЕННЯ",
+    "IGUI_DelNP_T_Desk_None": "Посилок немає",
+    "IGUI_DelNP_T_Desk_ClickHint": "Натисніть на посилку, щоб відкрити її: статус, ціна, виправлення",
+    "IGUI_DelNP_T_Desk_Count": "Показано %1 з %2",
+    "IGUI_DelNP_TMsg_StaffOnly": "Лише для працівників пошти та адміна"
 }
